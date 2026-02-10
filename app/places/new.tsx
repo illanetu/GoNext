@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -12,6 +12,8 @@ import {
 import { useRouter } from 'expo-router';
 import { createPlace, updatePlace } from '../../services/placesService';
 import * as Location from 'expo-location';
+
+const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
 export default function NewPlaceScreen() {
   const router = useRouter();
@@ -69,6 +71,7 @@ export default function NewPlaceScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <Card style={styles.card}>
           <Card.Content>
@@ -157,6 +160,7 @@ export default function NewPlaceScreen() {
           </Card.Content>
         </Card>
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -164,7 +168,9 @@ export default function NewPlaceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+  },
+  background: {
+    flex: 1,
   },
   scrollView: {
     flex: 1,

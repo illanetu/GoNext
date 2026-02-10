@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
   Card, 
@@ -12,6 +12,8 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { getAllPlaces, Place } from '../../services/placesService';
+
+const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
 export default function PlacesScreen() {
   const router = useRouter();
@@ -59,15 +61,18 @@ export default function PlacesScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
+        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" />
         </View>
+        </ImageBackground>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
       <View style={styles.searchContainer}>
         <Searchbar
           placeholder="Поиск мест..."
@@ -132,6 +137,7 @@ export default function PlacesScreen() {
         style={styles.fab}
         onPress={() => router.push('/places/new' as any)}
       />
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -139,7 +145,9 @@ export default function PlacesScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+  },
+  background: {
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,

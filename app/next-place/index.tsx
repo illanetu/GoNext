@@ -1,10 +1,13 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Title, Paragraph, Button } from 'react-native-paper';
+
+const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
 export default function NextPlaceScreen() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
       <View style={styles.content}>
         <Card style={styles.card}>
           <Card.Content>
@@ -18,6 +21,7 @@ export default function NextPlaceScreen() {
           </Card.Content>
         </Card>
       </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -25,7 +29,9 @@ export default function NextPlaceScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+  },
+  background: {
+    flex: 1,
   },
   content: {
     flex: 1,

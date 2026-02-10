@@ -1,13 +1,16 @@
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, Button, Card, Title } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+
+const bgImage = require('../assets/backgrounds/gonext-bg.png');
 
 export default function Home() {
   const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
       <Appbar.Header>
         <Appbar.Content title="GoNext" />
       </Appbar.Header>
@@ -57,6 +60,7 @@ export default function Home() {
           </Button>
         </View>
       </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -64,7 +68,9 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  background: {
+    flex: 1,
   },
   content: {
     flex: 1,

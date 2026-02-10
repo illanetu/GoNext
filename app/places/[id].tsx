@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Linking } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Linking, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -14,6 +14,8 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getPlaceWithPhotos, deletePlace, PlaceWithPhotos } from '../../services/placesService';
 import * as ImagePicker from 'expo-image-picker';
 import { addPhotoToPlace, removePhotoFromPlace } from '../../services/placesService';
+
+const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
 export default function PlaceDetailsScreen() {
   const router = useRouter();
@@ -129,9 +131,11 @@ export default function PlaceDetailsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
+        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" />
         </View>
+        </ImageBackground>
       </SafeAreaView>
     );
   }
@@ -139,16 +143,19 @@ export default function PlaceDetailsScreen() {
   if (!place) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
+        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
         <View style={styles.emptyContainer}>
           <Paragraph>Место не найдено</Paragraph>
           <Button onPress={() => router.back()}>Назад</Button>
         </View>
+        </ImageBackground>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         <Card style={styles.card}>
           <Card.Content>
@@ -243,6 +250,7 @@ export default function PlaceDetailsScreen() {
           </Card.Content>
         </Card>
       </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
@@ -250,7 +258,9 @@ export default function PlaceDetailsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+  },
+  background: {
+    flex: 1,
   },
   loadingContainer: {
     flex: 1,
