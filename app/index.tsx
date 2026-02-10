@@ -1,13 +1,10 @@
-import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Appbar, Text, Button, Snackbar } from 'react-native-paper';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Appbar, Button, Card, Title } from 'react-native-paper';
+import { useRouter } from 'expo-router';
 
 export default function Home() {
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
-
-  const showSnackbar = () => setSnackbarVisible(true);
-  const hideSnackbar = () => setSnackbarVisible(false);
+  const router = useRouter();
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -16,26 +13,50 @@ export default function Home() {
       </Appbar.Header>
       
       <View style={styles.content}>
-        <Text variant="headlineMedium" style={styles.text}>
-          Привет, Друг!
-        </Text>
-        
-        <Button 
-          mode="contained" 
-          onPress={showSnackbar}
-          style={styles.button}
-        >
-          Нажми меня
-        </Button>
-      </View>
+        <Card style={styles.card}>
+          <Card.Content>
+            <Title style={styles.title}>Дневник туриста</Title>
+          </Card.Content>
+        </Card>
 
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={hideSnackbar}
-        duration={3000}
-      >
-        Кнопка нажата
-      </Snackbar>
+        <View style={styles.buttonsContainer}>
+          <Button
+            mode="contained"
+            onPress={() => router.push('/places' as any)}
+            style={styles.button}
+            icon="map-marker"
+          >
+            Места
+          </Button>
+
+          <Button
+            mode="contained"
+            onPress={() => router.push('/trips' as any)}
+            style={styles.button}
+            icon="map"
+          >
+            Поездки
+          </Button>
+
+          <Button
+            mode="contained"
+            onPress={() => router.push('/next-place' as any)}
+            style={styles.button}
+            icon="navigation"
+          >
+            Следующее место
+          </Button>
+
+          <Button
+            mode="outlined"
+            onPress={() => router.push('/settings' as any)}
+            style={styles.button}
+            icon="cog"
+          >
+            Настройки
+          </Button>
+        </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -47,15 +68,19 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     padding: 20,
   },
-  text: {
-    marginBottom: 30,
+  card: {
+    marginBottom: 20,
+  },
+  title: {
     textAlign: 'center',
+    fontSize: 24,
+  },
+  buttonsContainer: {
+    gap: 12,
   },
   button: {
-    minWidth: 150,
+    marginVertical: 4,
   },
 });
