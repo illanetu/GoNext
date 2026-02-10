@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Appbar, Text, Button, Snackbar } from 'react-native-paper';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Home() {
   const [snackbarVisible, setSnackbarVisible] = useState(false);
@@ -10,33 +10,35 @@ export default function Home() {
   const hideSnackbar = () => setSnackbarVisible(false);
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <Appbar.Header>
-        <Appbar.Content title="GoNext" />
-      </Appbar.Header>
-      
-      <View style={styles.content}>
-        <Text variant="headlineMedium" style={styles.text}>
-          Привет, React Native Paper!
-        </Text>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <Appbar.Header>
+          <Appbar.Content title="GoNext" />
+        </Appbar.Header>
         
-        <Button 
-          mode="contained" 
-          onPress={showSnackbar}
-          style={styles.button}
-        >
-          Нажми меня
-        </Button>
-      </View>
+        <View style={styles.content}>
+          <Text variant="headlineMedium" style={styles.text}>
+            Привет, React Native Paper!
+          </Text>
+          
+          <Button 
+            mode="contained" 
+            onPress={showSnackbar}
+            style={styles.button}
+          >
+            Нажми меня
+          </Button>
+        </View>
 
-      <Snackbar
-        visible={snackbarVisible}
-        onDismiss={hideSnackbar}
-        duration={3000}
-      >
-        Кнопка нажата
-      </Snackbar>
-    </SafeAreaView>
+        <Snackbar
+          visible={snackbarVisible}
+          onDismiss={hideSnackbar}
+          duration={3000}
+        >
+          Кнопка нажата
+        </Snackbar>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
