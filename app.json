@@ -8,6 +8,6 @@
     "plugins": [
       "expo-router"
     ],
-    "platforms": ["ios", "android"]
+    "platforms": ["ios", "android", "web"]
   }
 }
