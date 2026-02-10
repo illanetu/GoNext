@@ -17,7 +17,7 @@ export default function Home() {
       
       <View style={styles.content}>
         <Text variant="headlineMedium" style={styles.text}>
-          Привет, React Native Paper!
+          Привет, Друг!
         </Text>
         
         <Button 
