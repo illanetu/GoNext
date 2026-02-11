@@ -1,6 +1,7 @@
 import { getDatabase } from '../database/db';
 import { TripPlace, Place, Photo, TripPlaceWithDetails } from '../types';
 import { getPlaceById } from './placesService';
+import { deletePhotosForEntity } from './photosService';
 
 type TripPlaceRow = {
   id: number;
@@ -55,12 +56,9 @@ export const removePlaceFromTrip = async (
   tripId: number,
   tripPlaceId: number
 ): Promise<void> => {
-  const db = await getDatabase();
+  await deletePhotosForEntity('trip_place', tripPlaceId);
 
-  await db.runAsync(
-    `DELETE FROM photos WHERE entityType = 'trip_place' AND entityId = ?;`,
-    [tripPlaceId]
-  );
+  const db = await getDatabase();
   await db.runAsync(
     `DELETE FROM trip_places WHERE id = ? AND tripId = ?;`,
     [tripPlaceId, tripId]
@@ -105,22 +103,7 @@ export const addNotesToTripPlace = async (
   );
 };
 
-// Добавление фото к посещению (trip_place)
-export const addPhotoToTripPlace = async (
-  tripPlaceId: number,
-  filePath: string
-): Promise<number> => {
-  const db = await getDatabase();
-  const createdAt = new Date().toISOString();
-
-  const result = await db.runAsync(
-    `INSERT INTO photos (entityType, entityId, filePath, createdAt)
-     VALUES ('trip_place', ?, ?, ?);`,
-    [tripPlaceId, filePath, createdAt]
-  );
-
-  return result.lastInsertRowId;
-};
+// Добавление и удаление фото — см. photosService (addPhotoToTripPlace, removePhotoFromTripPlace)
 
 // Получение фотографий места в поездке
 export const getTripPlacePhotos = async (
@@ -220,10 +203,3 @@ export const getTripPlaceWithDetails = async (
   };
 };
 
-// Удаление фотографии у места в поездке
-export const removePhotoFromTripPlace = async (
-  photoId: number
-): Promise<void> => {
-  const db = await getDatabase();
-  await db.runAsync(`DELETE FROM photos WHERE id = ?;`, [photoId]);
-};

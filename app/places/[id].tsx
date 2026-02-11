@@ -11,11 +11,12 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { getPlaceWithPhotos, deletePlace, PlaceWithPhotos } from '../../services/placesService';
+import { getPlaceWithPhotos, deletePlace } from '../../services/placesService';
+import type { PlaceWithPhotos } from '../../types';
+import { addPhotoToPlace, removePhotoFromPlace } from '../../services/photosService';
 import { openInMaps, openInNavigator } from '../../utils/maps';
 import { PlaceMapView } from '../../components/PlaceMapView';
-import * as ImagePicker from 'expo-image-picker';
-import { addPhotoToPlace, removePhotoFromPlace } from '../../services/placesService';
+import { PhotoGallery } from '../../components/PhotoGallery';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
@@ -84,26 +85,14 @@ export default function PlaceDetailsScreen() {
     openInNavigator(place.latitude, place.longitude);
   };
 
-  const handleAddPhoto = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Ошибка', 'Нужно разрешение на доступ к фотографиям');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0] && id && id !== 'new') {
-      try {
-        await addPhotoToPlace(parseInt(id), result.assets[0].uri);
-        await loadPlace();
-      } catch (error) {
-        Alert.alert('Ошибка', 'Не удалось добавить фотографию');
-      }
+  const handleAddPhoto = async (uri: string) => {
+    if (!id || id === 'new') return;
+    try {
+      await addPhotoToPlace(parseInt(id), uri);
+      await loadPlace();
+    } catch (error) {
+      console.error('Ошибка добавления фото:', error);
+      Alert.alert('Ошибка', 'Не удалось добавить фотографию');
     }
   };
 
@@ -221,30 +210,16 @@ export default function PlaceDetailsScreen() {
           <Card.Content>
             <View style={styles.photosHeader}>
               <Title>Фотографии</Title>
-              <Button mode="text" onPress={handleAddPhoto} icon="plus">
-                Добавить
-              </Button>
             </View>
-
-            {place.photos.length === 0 ? (
-              <Paragraph style={styles.emptyText}>Нет фотографий</Paragraph>
-            ) : (
-              <View style={styles.photosContainer}>
-                {place.photos.map((photo) => (
-                  <View key={photo.id} style={styles.photoItem}>
-                    <Paragraph numberOfLines={1} style={styles.photoPath}>
-                      {photo.filePath}
-                    </Paragraph>
-                    <IconButton
-                      icon="delete"
-                      iconColor="#d32f2f"
-                      size={20}
-                      onPress={() => handleDeletePhoto(photo.id)}
-                    />
-                  </View>
-                ))}
-              </View>
+            {place.photos.length === 0 && (
+              <Paragraph style={styles.emptyHint}>Нет фотографий</Paragraph>
             )}
+            <PhotoGallery
+              photos={place.photos}
+              onPhotoSelected={handleAddPhoto}
+              onDeletePhoto={handleDeletePhoto}
+              onError={(msg) => Alert.alert('Ошибка', msg)}
+            />
           </Card.Content>
         </Card>
       </ScrollView>
@@ -329,25 +304,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  photosContainer: {
-    marginTop: 10,
-  },
-  photoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 8,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 4,
-    marginBottom: 8,
-  },
-  photoPath: {
-    flex: 1,
-    fontSize: 12,
-  },
-  emptyText: {
-    textAlign: 'center',
+  emptyHint: {
     color: '#999',
-    marginTop: 10,
+    marginTop: 4,
+    marginBottom: 8,
   },
 });

@@ -12,7 +12,8 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
-import { getAllPlaces, Place } from '../../services/placesService';
+import { getAllPlaces } from '../../services/placesService';
+import type { Place } from '../../types';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 

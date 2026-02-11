@@ -25,8 +25,8 @@ import {
   removePlaceFromTrip,
   updatePlaceOrder,
   markPlaceAsVisited,
-  TripPlaceWithDetails,
 } from '../../../services/tripPlacesService';
+import type { TripPlaceWithDetails } from '../../../types';
 import type { Trip } from '../../../types';
 import { TripMapView } from '../../../components/TripMapView';
 

@@ -13,7 +13,6 @@ import {
   Paragraph,
   Button,
   TextInput,
-  IconButton,
   Chip,
   ActivityIndicator,
 } from 'react-native-paper';
@@ -22,13 +21,15 @@ import {
   getTripPlaceWithDetails,
   addNotesToTripPlace,
   markPlaceAsVisited,
+} from '../../../../services/tripPlacesService';
+import type { TripPlaceWithDetails } from '../../../../types';
+import {
   addPhotoToTripPlace,
   removePhotoFromTripPlace,
-  TripPlaceWithDetails,
-} from '../../../../services/tripPlacesService';
+} from '../../../../services/photosService';
 import { openInMaps, openInNavigator } from '../../../../utils/maps';
 import { PlaceMapView } from '../../../../components/PlaceMapView';
-import * as ImagePicker from 'expo-image-picker';
+import { PhotoGallery } from '../../../../components/PhotoGallery';
 
 const bgImage = require('../../../../assets/backgrounds/gonext-bg.png');
 
@@ -100,26 +101,13 @@ export default function TripPlaceScreen() {
     openInNavigator(item.place.latitude, item.place.longitude);
   };
 
-  const handleAddPhoto = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Ошибка', 'Нужно разрешение на доступ к фотографиям');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0] && tripPlaceId) {
-      try {
-        await addPhotoToTripPlace(parseInt(tripPlaceId), result.assets[0].uri);
-        await loadData();
-      } catch (error) {
-        Alert.alert('Ошибка', 'Не удалось добавить фотографию');
-      }
+  const handleAddPhoto = async (uri: string) => {
+    if (!tripPlaceId) return;
+    try {
+      await addPhotoToTripPlace(parseInt(tripPlaceId), uri);
+      await loadData();
+    } catch (error) {
+      Alert.alert('Ошибка', 'Не удалось добавить фотографию');
     }
   };
 
@@ -242,27 +230,16 @@ export default function TripPlaceScreen() {
             <Card.Content>
               <View style={styles.photosHeader}>
                 <Title>Фотографии</Title>
-                <Button mode="text" onPress={handleAddPhoto} icon="plus">
-                  Добавить
-                </Button>
               </View>
-              {item.photos.length === 0 ? (
+              {item.photos.length === 0 && (
                 <Paragraph style={styles.emptyText}>Нет фотографий</Paragraph>
-              ) : (
-                item.photos.map((photo) => (
-                  <View key={photo.id} style={styles.photoItem}>
-                    <Paragraph numberOfLines={1} style={styles.photoPath}>
-                      {photo.filePath}
-                    </Paragraph>
-                    <IconButton
-                      icon="delete"
-                      iconColor="#d32f2f"
-                      size={20}
-                      onPress={() => handleDeletePhoto(photo.id)}
-                    />
-                  </View>
-                ))
               )}
+              <PhotoGallery
+                photos={item.photos}
+                onPhotoSelected={handleAddPhoto}
+                onDeletePhoto={handleDeletePhoto}
+                onError={(msg) => Alert.alert('Ошибка', msg)}
+              />
             </Card.Content>
           </Card>
         </ScrollView>
@@ -339,19 +316,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     color: '#999',
-    marginTop: 8,
-  },
-  photoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 8,
-    backgroundColor: '#f9f9f9',
-    borderRadius: 4,
+    marginTop: 4,
     marginBottom: 8,
-  },
-  photoPath: {
-    flex: 1,
-    fontSize: 12,
   },
 });

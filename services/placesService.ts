@@ -1,5 +1,6 @@
 import { getDatabase } from '../database/db';
 import { Place, Photo, PlaceWithPhotos } from '../types';
+import { deletePhotosForEntity } from './photosService';
 
 // Создание нового места
 export const createPlace = async (place: Omit<Place, 'id' | 'createdAt'>): Promise<number> => {
@@ -124,19 +125,10 @@ export const updatePlace = async (id: number, place: Partial<Omit<Place, 'id' | 
 
 // Удаление места
 export const deletePlace = async (id: number): Promise<void> => {
-  const db = await getDatabase();
-  
-  // Сначала удаляем фотографии
-  await db.runAsync(
-    `DELETE FROM photos WHERE entityType = 'place' AND entityId = ?;`,
-    [id]
-  );
+  await deletePhotosForEntity('place', id);
 
-  // Затем удаляем само место
-  await db.runAsync(
-    `DELETE FROM places WHERE id = ?;`,
-    [id]
-  );
+  const db = await getDatabase();
+  await db.runAsync(`DELETE FROM places WHERE id = ?;`, [id]);
 };
 
 // Получение фотографий места
@@ -159,28 +151,7 @@ export const getPlacePhotos = async (placeId: number): Promise<Photo[]> => {
   }));
 };
 
-// Добавление фотографии к месту
-export const addPhotoToPlace = async (placeId: number, filePath: string): Promise<number> => {
-  const db = await getDatabase();
-  const createdAt = new Date().toISOString();
-  
-  const result = await db.runAsync(
-    `INSERT INTO photos (entityType, entityId, filePath, createdAt)
-     VALUES ('place', ?, ?, ?);`,
-    [placeId, filePath, createdAt]
-  );
-  
-  return result.lastInsertRowId;
-};
-
-// Удаление фотографии
-export const removePhotoFromPlace = async (photoId: number): Promise<void> => {
-  const db = await getDatabase();
-  await db.runAsync(
-    `DELETE FROM photos WHERE id = ?;`,
-    [photoId]
-  );
-};
+// Добавление и удаление фотографий — см. photosService (addPhotoToPlace, removePhotoFromPlace)
 
 // Получение места с фотографиями
 export const getPlaceWithPhotos = async (id: number): Promise<PlaceWithPhotos | null> => {

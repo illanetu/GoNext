@@ -18,9 +18,10 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { getNextPlace } from '../../services/nextPlaceService';
 import { markPlaceAsVisited } from '../../services/tripPlacesService';
-import { TripPlaceWithDetails } from '../../types';
+import type { TripPlaceWithDetails, Photo } from '../../types';
 import { openInMaps, openInNavigator } from '../../utils/maps';
 import { PlaceMapView } from '../../components/PlaceMapView';
+import { PhotoDisplay } from '../../components/PhotoDisplay';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
@@ -119,6 +120,7 @@ export default function NextPlaceScreen() {
     );
   }
 
+  if (!item) return null;
   const { place, photos } = item;
 
   return (
@@ -207,14 +209,12 @@ export default function NextPlaceScreen() {
               <Card.Content>
                 <Title style={styles.sectionTitle}>Фотографии</Title>
                 <View style={styles.photosContainer}>
-                  {photos.map((photo) => (
-                    <Paragraph
+                  {photos.map((photo: Photo) => (
+                    <PhotoDisplay
                       key={photo.id}
-                      numberOfLines={1}
-                      style={styles.photoPath}
-                    >
-                      {photo.filePath}
-                    </Paragraph>
+                      uri={photo.filePath}
+                      size={100}
+                    />
                   ))}
                 </View>
               </Card.Content>
@@ -300,11 +300,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   photosContainer: {
-    marginTop: 4,
-  },
-  photoPath: {
-    fontSize: 12,
-    color: '#666',
-    marginBottom: 4,
+    marginTop: 8,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
   },
 });

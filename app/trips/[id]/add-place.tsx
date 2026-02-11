@@ -10,7 +10,8 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { getAllPlaces, Place } from '../../../services/placesService';
+import { getAllPlaces } from '../../../services/placesService';
+import type { Place } from '../../../types';
 import { getTripPlaces, addPlaceToTrip } from '../../../services/tripPlacesService';
 
 const bgImage = require('../../../assets/backgrounds/gonext-bg.png');
