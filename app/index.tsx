@@ -1,9 +1,16 @@
 import { View, StyleSheet, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Appbar, Button, Card, Title } from 'react-native-paper';
+import { Appbar, Button, Card, Title, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 
 const bgImage = require('../assets/backgrounds/gonext-bg.png');
+
+const navItems = [
+  { href: '/places', label: 'Места', icon: 'map-marker' },
+  { href: '/trips', label: 'Поездки', icon: 'map' },
+  { href: '/next-place', label: 'Следующее место', icon: 'compass-outline' },
+  { href: '/settings', label: 'Настройки', icon: 'cog-outline' },
+] as const;
 
 export default function Home() {
   const router = useRouter();
@@ -11,55 +18,41 @@ export default function Home() {
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
-      <Appbar.Header>
-        <Appbar.Content title="GoNext" />
-      </Appbar.Header>
-      
-      <View style={styles.content}>
-        <Card style={styles.card}>
-          <Card.Content>
-            <Title style={styles.title}>Дневник туриста</Title>
-          </Card.Content>
-        </Card>
+        <Appbar.Header style={styles.header} elevated>
+          <Appbar.Content title="GoNext" titleStyle={styles.headerTitle} />
+        </Appbar.Header>
 
-        <View style={styles.buttonsContainer}>
-          <Button
-            mode="contained"
-            onPress={() => router.push('/places' as any)}
-            style={styles.button}
-            icon="map-marker"
-          >
-            Места
-          </Button>
+        <View style={styles.content}>
+          <Card style={styles.heroCard} mode="elevated">
+            <Card.Content>
+              <Title style={styles.appTitle}>GoNext</Title>
+              <Text variant="bodyLarge" style={styles.subtitle}>
+                Дневник туриста
+              </Text>
+            </Card.Content>
+          </Card>
 
-          <Button
-            mode="contained"
-            onPress={() => router.push('/trips' as any)}
-            style={styles.button}
-            icon="map"
-          >
-            Поездки
-          </Button>
-
-          <Button
-            mode="contained"
-            onPress={() => router.push('/next-place' as any)}
-            style={styles.button}
-            icon="navigation"
-          >
-            Следующее место
-          </Button>
-
-          <Button
-            mode="outlined"
-            onPress={() => router.push('/settings' as any)}
-            style={styles.button}
-            icon="cog"
-          >
-            Настройки
-          </Button>
+          <Card style={styles.menuCard} mode="elevated">
+            <Card.Content style={styles.menuContent}>
+              {navItems.map((item, index) => (
+                <Button
+                  key={item.href}
+                  mode="contained"
+                  onPress={() => router.push(item.href)}
+                  icon={item.icon}
+                  style={[
+                    styles.menuButton,
+                    index < navItems.length - 1 && styles.menuButtonBorder,
+                  ]}
+                  contentStyle={styles.menuButtonContent}
+                  labelStyle={styles.menuButtonLabel}
+                >
+                  {item.label}
+                </Button>
+              ))}
+            </Card.Content>
+          </Card>
         </View>
-      </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -72,21 +65,50 @@ const styles = StyleSheet.create({
   background: {
     flex: 1,
   },
+  header: {
+    backgroundColor: 'rgba(255,255,255,0.95)',
+  },
+  headerTitle: {
+    fontWeight: '700',
+    fontSize: 20,
+  },
   content: {
     flex: 1,
     padding: 20,
+    justifyContent: 'flex-start',
   },
-  card: {
-    marginBottom: 20,
+  heroCard: {
+    marginBottom: 24,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
-  title: {
+  appTitle: {
     textAlign: 'center',
-    fontSize: 24,
+    fontSize: 28,
+    marginBottom: 4,
   },
-  buttonsContainer: {
-    gap: 12,
+  subtitle: {
+    textAlign: 'center',
+    color: '#666',
   },
-  button: {
-    marginVertical: 4,
+  menuCard: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  menuContent: {
+    paddingVertical: 8,
+    gap: 0,
+  },
+  menuButton: {
+    marginVertical: 6,
+  },
+  menuButtonBorder: {
+    marginBottom: 0,
+  },
+  menuButtonContent: {
+    justifyContent: 'flex-start',
+  },
+  menuButtonLabel: {
+    fontSize: 16,
   },
 });

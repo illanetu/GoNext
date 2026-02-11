@@ -17,7 +17,12 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <PaperProvider>
         <StatusBar style="auto" />
-        <Stack>
+        <Stack
+          screenOptions={{
+            headerBackVisible: true,
+            headerBackTitleVisible: false,
+          }}
+        >
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen 
             name="places/index" 
