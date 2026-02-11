@@ -1,5 +1,7 @@
 import * as FileSystem from 'expo-file-system/legacy';
 import { getDatabase } from '../database/db';
+import type { Photo } from '../types';
+
 const PHOTOS_DIR = 'gonext_photos';
 
 /**
@@ -130,6 +132,45 @@ export const removePhotoFromTripPlace = async (photoId: number): Promise<void> =
   }
 
   await db.runAsync(`DELETE FROM photos WHERE id = ?;`, [photoId]);
+};
+
+/**
+ * Возвращает фотографии для нескольких trip_place (по entityId).
+ * Результат: Map<entityId, Photo[]> для оптимизации пакетной загрузки.
+ */
+export const getPhotosForTripPlaceIds = async (
+  tripPlaceIds: number[]
+): Promise<Map<number, Photo[]>> => {
+  if (tripPlaceIds.length === 0) {
+    return new Map();
+  }
+  const db = await getDatabase();
+  const placeholders = tripPlaceIds.map(() => '?').join(',');
+  const rows = await db.getAllAsync<{
+    id: number;
+    entityType: string;
+    entityId: number;
+    filePath: string;
+    createdAt: string;
+  }>(
+    `SELECT * FROM photos WHERE entityType = 'trip_place' AND entityId IN (${placeholders}) ORDER BY createdAt DESC;`,
+    tripPlaceIds
+  );
+
+  const map = new Map<number, Photo[]>();
+  for (const row of rows) {
+    const photo: Photo = {
+      id: row.id,
+      entityType: 'trip_place',
+      entityId: row.entityId,
+      filePath: row.filePath,
+      createdAt: row.createdAt,
+    };
+    const list = map.get(row.entityId) ?? [];
+    list.push(photo);
+    map.set(row.entityId, list);
+  }
+  return map;
 };
 
 /**

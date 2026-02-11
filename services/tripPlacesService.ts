@@ -1,7 +1,7 @@
 import { getDatabase } from '../database/db';
-import { TripPlace, Place, Photo, TripPlaceWithDetails } from '../types';
-import { getPlaceById, getPlacePhotos } from './placesService';
-import { deletePhotosForEntity } from './photosService';
+import { TripPlace, Photo, TripPlaceWithDetails } from '../types';
+import { getPlaceById, getPlacePhotos, getPlacesByIds } from './placesService';
+import { deletePhotosForEntity, getPhotosForTripPlaceIds } from './photosService';
 
 type TripPlaceRow = {
   id: number;
@@ -151,17 +151,26 @@ export const getTripPlaces = async (tripId: number): Promise<TripPlace[]> => {
   return result.map(rowToTripPlace);
 };
 
-// Получение мест поездки с деталями (место + фото)
+// Получение мест поездки с деталями (место + фото), пакетные запросы вместо N+1
 export const getTripPlacesWithDetails = async (
   tripId: number
 ): Promise<TripPlaceWithDetails[]> => {
   const tripPlaces = await getTripPlaces(tripId);
+  if (tripPlaces.length === 0) {
+    return [];
+  }
+
+  const placeIds = [...new Set(tripPlaces.map((tp) => tp.placeId))];
+  const tripPlaceIds = tripPlaces.map((tp) => tp.id);
+  const [placesMap, photosMap] = await Promise.all([
+    getPlacesByIds(placeIds),
+    getPhotosForTripPlaceIds(tripPlaceIds),
+  ]);
+
   const result: TripPlaceWithDetails[] = [];
-
   for (const tp of tripPlaces) {
-    const place = await getPlaceById(tp.placeId);
-    const photos = await getTripPlacePhotos(tp.id);
-
+    const place = placesMap.get(tp.placeId);
+    const photos = photosMap.get(tp.id) ?? [];
     if (place) {
       result.push({
         ...tp,
@@ -170,7 +179,6 @@ export const getTripPlacesWithDetails = async (
       });
     }
   }
-
   return result;
 };
 

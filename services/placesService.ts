@@ -50,6 +50,40 @@ export const getAllPlaces = async (): Promise<Place[]> => {
   }));
 };
 
+// Получение нескольких мест по ID (для оптимизации запросов)
+export const getPlacesByIds = async (ids: number[]): Promise<Map<number, Place>> => {
+  if (ids.length === 0) {
+    return new Map();
+  }
+  const db = await getDatabase();
+  const placeholders = ids.map(() => '?').join(',');
+  const result = await db.getAllAsync<{
+    id: number;
+    name: string;
+    description: string;
+    visitlater: number;
+    liked: number;
+    latitude: number | null;
+    longitude: number | null;
+    createdAt: string;
+  }>(`SELECT * FROM places WHERE id IN (${placeholders});`, ids);
+
+  const map = new Map<number, Place>();
+  for (const row of result) {
+    map.set(row.id, {
+      id: row.id,
+      name: row.name,
+      description: row.description,
+      visitlater: row.visitlater === 1,
+      liked: row.liked === 1,
+      latitude: row.latitude,
+      longitude: row.longitude,
+      createdAt: row.createdAt,
+    });
+  }
+  return map;
+};
+
 // Получение места по ID
 export const getPlaceById = async (id: number): Promise<Place | null> => {
   const db = await getDatabase();

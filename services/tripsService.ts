@@ -1,5 +1,6 @@
 import { getDatabase } from '../database/db';
 import { Trip } from '../types';
+import { deletePhotosForEntity } from './photosService';
 
 type TripRow = {
   id: number;
@@ -113,10 +114,16 @@ export const updateTrip = async (
   );
 };
 
-// Удаление поездки
+// Удаление поездки (включая фото мест в поездке)
 export const deleteTrip = async (id: number): Promise<void> => {
   const db = await getDatabase();
-
+  const tripPlaces = await db.getAllAsync<{ id: number }>(
+    `SELECT id FROM trip_places WHERE tripId = ?;`,
+    [id]
+  );
+  for (const tp of tripPlaces) {
+    await deletePhotosForEntity('trip_place', tp.id);
+  }
   await db.runAsync(`DELETE FROM trip_places WHERE tripId = ?;`, [id]);
   await db.runAsync(`DELETE FROM trips WHERE id = ?;`, [id]);
 };

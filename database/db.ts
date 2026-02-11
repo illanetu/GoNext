@@ -80,6 +80,9 @@ export const initDatabase = async (): Promise<void> => {
     await database.execAsync(`
       CREATE INDEX IF NOT EXISTS idx_photos_entity ON photos(entityType, entityId);
     `);
+    await database.execAsync(`
+      CREATE INDEX IF NOT EXISTS idx_trips_current ON trips(current);
+    `);
 
     console.log('База данных успешно инициализирована');
   } catch (error) {
