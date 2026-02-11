@@ -1,6 +1,6 @@
 import { getDatabase } from '../database/db';
 import { TripPlace, Place, Photo, TripPlaceWithDetails } from '../types';
-import { getPlaceById } from './placesService';
+import { getPlaceById, getPlacePhotos } from './placesService';
 import { deletePhotosForEntity } from './photosService';
 
 type TripPlaceRow = {
@@ -190,7 +190,13 @@ export const getTripPlaceWithDetails = async (
 
   const tripPlace = rowToTripPlace(row);
   const place = await getPlaceById(tripPlace.placeId);
-  const photos = await getTripPlacePhotos(tripPlace.id);
+  const [placePhotos, tripPlacePhotos] = await Promise.all([
+    getPlacePhotos(tripPlace.placeId),
+    getTripPlacePhotos(tripPlace.id),
+  ]);
+  const photos = [...placePhotos, ...tripPlacePhotos].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 
   if (!place) {
     return null;

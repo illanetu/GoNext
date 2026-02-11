@@ -45,20 +45,8 @@ export default function RootLayout() {
             options={{ title: 'Новая поездка', headerShown: true }} 
           />
           <Stack.Screen 
-            name="trips/[id]/details" 
-            options={{ title: 'Поездка', headerShown: true }} 
-          />
-          <Stack.Screen 
-            name="trips/[id]/edit" 
-            options={{ title: 'Редактирование поездки', headerShown: true }} 
-          />
-          <Stack.Screen 
-            name="trips/[id]/add-place" 
-            options={{ title: 'Добавить место', headerShown: true }} 
-          />
-          <Stack.Screen 
-            name="trips/[id]/place/[tripPlaceId]" 
-            options={{ title: 'Место в поездке', headerShown: true }} 
+            name="trips/[id]" 
+            options={{ title: 'Поездка', headerShown: false }} 
           />
           <Stack.Screen 
             name="next-place/index" 

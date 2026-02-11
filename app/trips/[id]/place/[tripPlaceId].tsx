@@ -26,6 +26,7 @@ import type { TripPlaceWithDetails } from '../../../../types';
 import {
   addPhotoToTripPlace,
   removePhotoFromTripPlace,
+  removePhotoFromPlace,
 } from '../../../../services/photosService';
 import { openInMaps, openInNavigator } from '../../../../utils/maps';
 import { PlaceMapView } from '../../../../components/PlaceMapView';
@@ -112,8 +113,14 @@ export default function TripPlaceScreen() {
   };
 
   const handleDeletePhoto = async (photoId: number) => {
+    const photo = item?.photos.find((p) => p.id === photoId);
+    if (!photo) return;
     try {
-      await removePhotoFromTripPlace(photoId);
+      if (photo.entityType === 'place') {
+        await removePhotoFromPlace(photoId);
+      } else {
+        await removePhotoFromTripPlace(photoId);
+      }
       await loadData();
     } catch (error) {
       Alert.alert('Ошибка', 'Не удалось удалить фотографию');

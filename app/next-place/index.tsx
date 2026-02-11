@@ -18,10 +18,10 @@ import {
 import { useFocusEffect } from '@react-navigation/native';
 import { getNextPlace } from '../../services/nextPlaceService';
 import { markPlaceAsVisited } from '../../services/tripPlacesService';
-import type { TripPlaceWithDetails, Photo } from '../../types';
+import type { TripPlaceWithDetails } from '../../types';
 import { openInMaps, openInNavigator } from '../../utils/maps';
 import { PlaceMapView } from '../../components/PlaceMapView';
-import { PhotoDisplay } from '../../components/PhotoDisplay';
+import { PhotoGallery } from '../../components/PhotoGallery';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
@@ -208,15 +208,11 @@ export default function NextPlaceScreen() {
             <Card style={styles.card}>
               <Card.Content>
                 <Title style={styles.sectionTitle}>Фотографии</Title>
-                <View style={styles.photosContainer}>
-                  {photos.map((photo: Photo) => (
-                    <PhotoDisplay
-                      key={photo.id}
-                      uri={photo.filePath}
-                      size={100}
-                    />
-                  ))}
-                </View>
+                <PhotoGallery
+                  photos={photos}
+                  allowDelete={false}
+                  showAddButton={false}
+                />
               </Card.Content>
             </Card>
           )}
