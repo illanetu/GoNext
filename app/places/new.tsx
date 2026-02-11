@@ -9,14 +9,16 @@ import {
   Paragraph,
   ActivityIndicator,
 } from 'react-native-paper';
-import { useRouter } from 'expo-router';
-import { createPlace, updatePlace } from '../../services/placesService';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import { createPlace } from '../../services/placesService';
+import { addPlaceToTrip } from '../../services/tripPlacesService';
 import * as Location from 'expo-location';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
 export default function NewPlaceScreen() {
   const router = useRouter();
+  const { tripId } = useLocalSearchParams<{ tripId?: string }>();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [visitlater, setVisitlater] = useState(false);
@@ -52,7 +54,7 @@ export default function NewPlaceScreen() {
 
     try {
       setLoading(true);
-      await createPlace({
+      const placeId = await createPlace({
         name: name.trim(),
         description: description.trim(),
         visitlater,
@@ -60,7 +62,12 @@ export default function NewPlaceScreen() {
         latitude: latitude ? parseFloat(latitude) : null,
         longitude: longitude ? parseFloat(longitude) : null,
       });
-      router.back();
+      if (tripId) {
+        await addPlaceToTrip(parseInt(tripId), placeId);
+        router.replace(`/trips/${tripId}/details` as any);
+      } else {
+        router.back();
+      }
     } catch (error) {
       console.error('Ошибка сохранения места:', error);
       Alert.alert('Ошибка', 'Не удалось сохранить место');
