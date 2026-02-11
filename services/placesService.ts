@@ -1,8 +1,13 @@
+/**
+ * Сервис работы с местами (режим «Места»).
+ * CRUD, получение места с фотографиями. Фото добавляются через photosService.
+ * @see docs/SERVICES.md
+ */
 import { getDatabase } from '../database/db';
 import { Place, Photo, PlaceWithPhotos } from '../types';
 import { deletePhotosForEntity } from './photosService';
 
-// Создание нового места
+/** Создание нового места. Возвращает id созданной записи. */
 export const createPlace = async (place: Omit<Place, 'id' | 'createdAt'>): Promise<number> => {
   const db = await getDatabase();
   const createdAt = new Date().toISOString();

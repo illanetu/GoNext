@@ -1,10 +1,15 @@
+/**
+ * Модуль инициализации локальной SQLite-базы данных GoNext.
+ * Все данные приложения хранятся в одной БД (places, trips, trip_places, photos).
+ * Подробная структура таблиц — в docs/DATABASE.md
+ */
 import * as SQLite from 'expo-sqlite';
 
 const DATABASE_NAME = 'gonext.db';
 
 let db: SQLite.SQLiteDatabase | null = null;
 
-// Получение экземпляра базы данных
+/** Получение экземпляра базы данных (singleton). */
 export const getDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
   if (!db) {
     db = await SQLite.openDatabaseAsync(DATABASE_NAME);
@@ -12,7 +17,7 @@ export const getDatabase = async (): Promise<SQLite.SQLiteDatabase> => {
   return db;
 };
 
-// Инициализация базы данных
+/** Инициализация БД: создание таблиц и индексов при первом запуске. */
 export const initDatabase = async (): Promise<void> => {
   try {
     const database = await getDatabase();

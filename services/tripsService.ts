@@ -1,3 +1,8 @@
+/**
+ * Сервис работы с поездками (режим «Поездки»).
+ * CRUD, текущая поездка, список с количеством мест.
+ * @see docs/SERVICES.md
+ */
 import { getDatabase } from '../database/db';
 import { Trip } from '../types';
 import { deletePhotosForEntity } from './photosService';

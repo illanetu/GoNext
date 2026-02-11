@@ -1,3 +1,7 @@
+/**
+ * Сервис работы с местами в поездке (маршрут): добавление, порядок, посещения, заметки, фото.
+ * @see docs/SERVICES.md
+ */
 import { getDatabase } from '../database/db';
 import { TripPlace, Photo, TripPlaceWithDetails } from '../types';
 import { getPlaceById, getPlacePhotos, getPlacesByIds } from './placesService';
