@@ -23,9 +23,17 @@ export default function NewPlaceScreen() {
   const [description, setDescription] = useState('');
   const [visitlater, setVisitlater] = useState(false);
   const [liked, setLiked] = useState(false);
-  const [latitude, setLatitude] = useState<string>('');
-  const [longitude, setLongitude] = useState<string>('');
+  const [coordinates, setCoordinates] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const parseCoordinates = (value: string): { lat: number | null; lng: number | null } => {
+    const parts = value.split(',').map((s) => s.trim()).filter(Boolean);
+    if (parts.length < 2) return { lat: null, lng: null };
+    const lat = parseFloat(parts[0]);
+    const lng = parseFloat(parts[1]);
+    if (Number.isNaN(lat) || Number.isNaN(lng)) return { lat: null, lng: null };
+    return { lat, lng };
+  };
 
   const handleGetCurrentLocation = async () => {
     try {
@@ -37,8 +45,9 @@ export default function NewPlaceScreen() {
 
       setLoading(true);
       const location = await Location.getCurrentPositionAsync({});
-      setLatitude(location.coords.latitude.toString());
-      setLongitude(location.coords.longitude.toString());
+      setCoordinates(
+        `${location.coords.latitude}, ${location.coords.longitude}`
+      );
     } catch (error) {
       Alert.alert('Ошибка', 'Не удалось получить текущее местоположение');
     } finally {
@@ -52,6 +61,8 @@ export default function NewPlaceScreen() {
       return;
     }
 
+    const { lat, lng } = parseCoordinates(coordinates);
+
     try {
       setLoading(true);
       const placeId = await createPlace({
@@ -59,8 +70,8 @@ export default function NewPlaceScreen() {
         description: description.trim(),
         visitlater,
         liked,
-        latitude: latitude ? parseFloat(latitude) : null,
-        longitude: longitude ? parseFloat(longitude) : null,
+        latitude: lat,
+        longitude: lng,
       });
       if (tripId) {
         await addPlaceToTrip(parseInt(tripId), placeId);
@@ -124,23 +135,12 @@ export default function NewPlaceScreen() {
               </Button>
 
               <TextInput
-                label="Широта"
-                value={latitude}
-                onChangeText={setLatitude}
+                label="Широта, долгота"
+                value={coordinates}
+                onChangeText={setCoordinates}
                 style={styles.input}
                 mode="outlined"
-                keyboardType="numeric"
-                placeholder="например: 55.7558"
-              />
-
-              <TextInput
-                label="Долгота"
-                value={longitude}
-                onChangeText={setLongitude}
-                style={styles.input}
-                mode="outlined"
-                keyboardType="numeric"
-                placeholder="например: 37.6173"
+                placeholder="42.855194, 131.419915"
               />
             </View>
 
