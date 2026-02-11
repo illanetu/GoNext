@@ -8,6 +8,13 @@
     "plugins": [
       "expo-router"
     ],
-    "platforms": ["ios", "android", "web"]
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "android": {
+      "package": "com.anonymous.gonext"
+    }
   }
 }

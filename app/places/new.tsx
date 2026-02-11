@@ -12,7 +12,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { createPlace } from '../../services/placesService';
 import { addPlaceToTrip } from '../../services/tripPlacesService';
-import * as Location from 'expo-location';
+import { MapPicker } from '../../components/MapPicker';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
@@ -23,8 +23,16 @@ export default function NewPlaceScreen() {
   const [description, setDescription] = useState('');
   const [visitlater, setVisitlater] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
   const [coordinates, setCoordinates] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const handleCoordinateSelect = (latitude: number, longitude: number) => {
+    setLat(latitude);
+    setLng(longitude);
+    setCoordinates(`${latitude}, ${longitude}`);
+  };
 
   const parseCoordinates = (value: string): { lat: number | null; lng: number | null } => {
     const parts = value.split(',').map((s) => s.trim()).filter(Boolean);
@@ -35,33 +43,13 @@ export default function NewPlaceScreen() {
     return { lat, lng };
   };
 
-  const handleGetCurrentLocation = async () => {
-    try {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Ошибка', 'Нужно разрешение на доступ к геолокации');
-        return;
-      }
-
-      setLoading(true);
-      const location = await Location.getCurrentPositionAsync({});
-      setCoordinates(
-        `${location.coords.latitude}, ${location.coords.longitude}`
-      );
-    } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось получить текущее местоположение');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleSave = async () => {
     if (!name.trim()) {
       Alert.alert('Ошибка', 'Название места обязательно');
       return;
     }
 
-    const { lat, lng } = parseCoordinates(coordinates);
+    const coords = lat != null && lng != null ? { lat, lng } : parseCoordinates(coordinates);
 
     try {
       setLoading(true);
@@ -70,8 +58,8 @@ export default function NewPlaceScreen() {
         description: description.trim(),
         visitlater,
         liked,
-        latitude: lat,
-        longitude: lng,
+        latitude: coords.lat,
+        longitude: coords.lng,
       });
       if (tripId) {
         await addPlaceToTrip(parseInt(tripId), placeId);
@@ -123,21 +111,25 @@ export default function NewPlaceScreen() {
 
             <View style={styles.coordinatesSection}>
               <Paragraph style={styles.sectionTitle}>Координаты (необязательно)</Paragraph>
-              
-              <Button
-                mode="outlined"
-                onPress={handleGetCurrentLocation}
-                icon="crosshairs-gps"
-                style={styles.locationButton}
-                loading={loading}
-              >
-                Использовать текущее местоположение
-              </Button>
+
+              <View style={styles.mapPickerWrap}>
+                <MapPicker
+                  latitude={lat}
+                  longitude={lng}
+                  onCoordinateSelect={handleCoordinateSelect}
+                  height={220}
+                />
+              </View>
 
               <TextInput
-                label="Широта, долгота"
+                label="Широта, долгота (или введите вручную)"
                 value={coordinates}
-                onChangeText={setCoordinates}
+                onChangeText={(v) => {
+                  setCoordinates(v);
+                  const p = parseCoordinates(v);
+                  setLat(p.lat);
+                  setLng(p.lng);
+                }}
                 style={styles.input}
                 mode="outlined"
                 placeholder="42.855194, 131.419915"
@@ -209,8 +201,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 10,
   },
-  locationButton: {
-    marginBottom: 15,
+  mapPickerWrap: {
+    marginBottom: 12,
   },
   buttonsContainer: {
     marginTop: 20,

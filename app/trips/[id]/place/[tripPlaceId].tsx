@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Linking,
   ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -27,6 +26,8 @@ import {
   removePhotoFromTripPlace,
   TripPlaceWithDetails,
 } from '../../../../services/tripPlacesService';
+import { openInMaps, openInNavigator } from '../../../../utils/maps';
+import { PlaceMapView } from '../../../../components/PlaceMapView';
 import * as ImagePicker from 'expo-image-picker';
 
 const bgImage = require('../../../../assets/backgrounds/gonext-bg.png');
@@ -88,11 +89,7 @@ export default function TripPlaceScreen() {
       Alert.alert('Ошибка', 'Координаты места не указаны');
       return;
     }
-    const url = `https://www.google.com/maps/search/?api=1&query=${item.place.latitude},${item.place.longitude}`;
-    Linking.openURL(url).catch((err) => {
-      console.error(err);
-      Alert.alert('Ошибка', 'Не удалось открыть карту');
-    });
+    openInMaps(item.place.latitude, item.place.longitude);
   };
 
   const handleOpenNavigator = () => {
@@ -100,14 +97,7 @@ export default function TripPlaceScreen() {
       Alert.alert('Ошибка', 'Координаты места не указаны');
       return;
     }
-    const url = `google.navigation:q=${item.place.latitude},${item.place.longitude}`;
-    Linking.openURL(url).catch(() => {
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item.place.latitude},${item.place.longitude}`;
-      Linking.openURL(mapsUrl).catch((err) => {
-        console.error(err);
-        Alert.alert('Ошибка', 'Не удалось открыть навигатор');
-      });
-    });
+    openInNavigator(item.place.latitude, item.place.longitude);
   };
 
   const handleAddPhoto = async () => {
@@ -198,19 +188,29 @@ export default function TripPlaceScreen() {
               ) : null}
 
               {place.latitude != null && place.longitude != null && (
-                <View style={styles.buttonsRow}>
-                  <Button mode="contained" onPress={handleOpenMap} icon="map" style={styles.btn}>
-                    На карте
-                  </Button>
-                  <Button
-                    mode="outlined"
-                    onPress={handleOpenNavigator}
-                    icon="navigation"
-                    style={styles.btn}
-                  >
-                    Навигатор
-                  </Button>
-                </View>
+                <>
+                  <View style={styles.mapContainer}>
+                    <PlaceMapView
+                      latitude={place.latitude}
+                      longitude={place.longitude}
+                      title={place.name}
+                      height={200}
+                    />
+                  </View>
+                  <View style={styles.buttonsRow}>
+                    <Button mode="contained" onPress={handleOpenMap} icon="map" style={styles.btn}>
+                      На карте
+                    </Button>
+                    <Button
+                      mode="outlined"
+                      onPress={handleOpenNavigator}
+                      icon="navigation"
+                      style={styles.btn}
+                    >
+                      Навигатор
+                    </Button>
+                  </View>
+                </>
               )}
             </Card.Content>
           </Card>
@@ -311,6 +311,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   description: {
+    marginBottom: 12,
+  },
+  mapContainer: {
+    marginTop: 12,
     marginBottom: 12,
   },
   buttonsRow: {

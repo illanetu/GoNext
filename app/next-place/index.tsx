@@ -4,7 +4,6 @@ import {
   StyleSheet,
   ScrollView,
   Alert,
-  Linking,
   ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,6 +19,8 @@ import { useFocusEffect } from '@react-navigation/native';
 import { getNextPlace } from '../../services/nextPlaceService';
 import { markPlaceAsVisited } from '../../services/tripPlacesService';
 import { TripPlaceWithDetails } from '../../types';
+import { openInMaps, openInNavigator } from '../../utils/maps';
+import { PlaceMapView } from '../../components/PlaceMapView';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
 
@@ -54,11 +55,7 @@ export default function NextPlaceScreen() {
       Alert.alert('Ошибка', 'Координаты места не указаны');
       return;
     }
-    const url = `https://www.google.com/maps/search/?api=1&query=${item.place.latitude},${item.place.longitude}`;
-    Linking.openURL(url).catch((err) => {
-      console.error('Ошибка открытия карты:', err);
-      Alert.alert('Ошибка', 'Не удалось открыть карту');
-    });
+    openInMaps(item.place.latitude, item.place.longitude);
   };
 
   const handleOpenNavigator = () => {
@@ -66,14 +63,7 @@ export default function NextPlaceScreen() {
       Alert.alert('Ошибка', 'Координаты места не указаны');
       return;
     }
-    const url = `google.navigation:q=${item.place.latitude},${item.place.longitude}`;
-    Linking.openURL(url).catch(() => {
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${item!.place!.latitude},${item!.place!.longitude}`;
-      Linking.openURL(mapsUrl).catch((err) => {
-        console.error('Ошибка открытия навигатора:', err);
-        Alert.alert('Ошибка', 'Не удалось открыть навигатор');
-      });
-    });
+    openInNavigator(item.place.latitude, item.place.longitude);
   };
 
   const handleMarkVisited = async () => {
@@ -164,9 +154,19 @@ export default function NextPlaceScreen() {
               ) : null}
 
               {place.latitude != null && place.longitude != null && (
-                <Paragraph style={styles.coordinates}>
-                  📍 {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
-                </Paragraph>
+                <>
+                  <Paragraph style={styles.coordinates}>
+                    📍 {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
+                  </Paragraph>
+                  <View style={styles.mapContainer}>
+                    <PlaceMapView
+                      latitude={place.latitude}
+                      longitude={place.longitude}
+                      title={place.name}
+                      height={200}
+                    />
+                  </View>
+                </>
               )}
 
               <View style={styles.buttonsContainer}>
@@ -284,6 +284,9 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 14,
     color: '#666',
+  },
+  mapContainer: {
+    marginTop: 12,
   },
   buttonsContainer: {
     marginTop: 20,

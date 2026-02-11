@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, Linking, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -12,6 +12,8 @@ import {
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getPlaceWithPhotos, deletePlace, PlaceWithPhotos } from '../../services/placesService';
+import { openInMaps, openInNavigator } from '../../utils/maps';
+import { PlaceMapView } from '../../components/PlaceMapView';
 import * as ImagePicker from 'expo-image-picker';
 import { addPhotoToPlace, removePhotoFromPlace } from '../../services/placesService';
 
@@ -71,12 +73,7 @@ export default function PlaceDetailsScreen() {
       Alert.alert('Ошибка', 'Координаты места не указаны');
       return;
     }
-
-    const url = `https://www.google.com/maps/search/?api=1&query=${place.latitude},${place.longitude}`;
-    Linking.openURL(url).catch((err) => {
-      console.error('Ошибка открытия карты:', err);
-      Alert.alert('Ошибка', 'Не удалось открыть карту');
-    });
+    openInMaps(place.latitude, place.longitude);
   };
 
   const handleOpenNavigator = () => {
@@ -84,16 +81,7 @@ export default function PlaceDetailsScreen() {
       Alert.alert('Ошибка', 'Координаты места не указаны');
       return;
     }
-
-    const url = `google.navigation:q=${place.latitude},${place.longitude}`;
-    Linking.openURL(url).catch(() => {
-      // Fallback на Google Maps
-      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}`;
-      Linking.openURL(mapsUrl).catch((err) => {
-        console.error('Ошибка открытия навигатора:', err);
-        Alert.alert('Ошибка', 'Не удалось открыть навигатор');
-      });
-    });
+    openInNavigator(place.latitude, place.longitude);
   };
 
   const handleAddPhoto = async () => {
@@ -187,11 +175,21 @@ export default function PlaceDetailsScreen() {
             )}
 
             {place.latitude && place.longitude && (
-              <View style={styles.coordinatesContainer}>
-                <Paragraph style={styles.coordinates}>
-                  📍 Координаты: {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
-                </Paragraph>
-              </View>
+              <>
+                <View style={styles.coordinatesContainer}>
+                  <Paragraph style={styles.coordinates}>
+                    📍 Координаты: {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
+                  </Paragraph>
+                </View>
+                <View style={styles.mapContainer}>
+                  <PlaceMapView
+                    latitude={place.latitude}
+                    longitude={place.longitude}
+                    title={place.name}
+                    height={200}
+                  />
+                </View>
+              </>
             )}
 
             <View style={styles.buttonsContainer}>
@@ -314,6 +312,9 @@ const styles = StyleSheet.create({
   coordinates: {
     fontSize: 14,
     color: '#666',
+  },
+  mapContainer: {
+    marginTop: 12,
   },
   buttonsContainer: {
     marginTop: 20,

@@ -28,6 +28,7 @@ import {
   TripPlaceWithDetails,
 } from '../../../services/tripPlacesService';
 import type { Trip } from '../../../types';
+import { TripMapView } from '../../../components/TripMapView';
 
 const bgImage = require('../../../assets/backgrounds/gonext-bg.png');
 
@@ -243,6 +244,15 @@ export default function TripDetailsScreen() {
             </Card.Content>
           </Card>
 
+          {places.length > 0 && (
+            <Card style={styles.card}>
+              <Card.Content>
+                <Title style={styles.mapTitle}>Карта маршрута</Title>
+                <TripMapView places={places} height={220} />
+              </Card.Content>
+            </Card>
+          )}
+
           <Card style={styles.card}>
             <Card.Content>
               <View style={styles.sectionHeader}>
@@ -394,6 +404,9 @@ const styles = StyleSheet.create({
   dates: {
     fontSize: 14,
     color: '#666',
+  },
+  mapTitle: {
+    marginBottom: 10,
   },
   sectionHeader: {
     flexDirection: 'row',
