@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, ScrollView, RefreshControl, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { 
@@ -11,6 +11,7 @@ import {
   ActivityIndicator 
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useFocusEffect } from '@react-navigation/native';
 import { getAllPlaces, Place } from '../../services/placesService';
 
 const bgImage = require('../../assets/backgrounds/gonext-bg.png');
@@ -36,9 +37,12 @@ export default function PlacesScreen() {
     }
   };
 
-  useEffect(() => {
-    loadPlaces();
-  }, []);
+  // Загрузка при открытии экрана и при возврате (например, после сохранения нового места)
+  useFocusEffect(
+    useCallback(() => {
+      loadPlaces();
+    }, [])
+  );
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -132,11 +136,13 @@ export default function PlacesScreen() {
         )}
       </ScrollView>
 
-      <FAB
-        icon="plus"
-        style={styles.fab}
-        onPress={() => router.push('/places/new' as any)}
-      />
+      <View style={styles.fabContainer} pointerEvents="box-none">
+        <FAB
+          icon="plus"
+          style={styles.fab}
+          onPress={() => router.navigate('/places/new')}
+        />
+      </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -203,10 +209,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#999',
   },
-  fab: {
+  fabContainer: {
     position: 'absolute',
-    margin: 16,
     right: 0,
     bottom: 0,
+    margin: 16,
+    zIndex: 10,
+  },
+  fab: {
   },
 });
