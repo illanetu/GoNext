@@ -1,14 +1,33 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Stack } from 'expo-router';
-import { PaperProvider } from 'react-native-paper';
+import { PaperProvider, MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { initDatabase } from '../database/db';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
+import { getOnPrimary } from '../utils/themeColors';
 
 function StatusBarTheme() {
   const { isDark } = useTheme();
   return <StatusBar style={isDark ? 'light' : 'auto'} />;
+}
+
+function PaperThemeWrapper({ children }: { children: React.ReactNode }) {
+  const { isDark, primaryColor } = useTheme();
+  const paperTheme = useMemo(() => {
+    const base = isDark ? MD3DarkTheme : MD3LightTheme;
+    const onPrimary = getOnPrimary(primaryColor);
+    return {
+      ...base,
+      colors: {
+        ...base.colors,
+        primary: primaryColor,
+        onPrimary,
+      },
+    };
+  }, [isDark, primaryColor]);
+
+  return <PaperProvider theme={paperTheme}>{children}</PaperProvider>;
 }
 
 export default function RootLayout() {
@@ -22,7 +41,7 @@ export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <PaperProvider>
+        <PaperThemeWrapper>
           <StatusBarTheme />
           <Stack
           screenOptions={{
@@ -64,7 +83,7 @@ export default function RootLayout() {
             options={{ title: 'Настройки', headerShown: true }} 
           />
         </Stack>
-        </PaperProvider>
+        </PaperThemeWrapper>
       </ThemeProvider>
     </SafeAreaProvider>
   );

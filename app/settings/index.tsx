@@ -1,16 +1,19 @@
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Title, Paragraph, List, SegmentedButtons } from 'react-native-paper';
 import { ScreenBackground } from '../../components/ScreenBackground';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme, THEME_COLOR_PALETTE } from '../../contexts/ThemeContext';
 
 const APP_VERSION = '1.0.0';
 const APP_NAME = 'GoNext';
 const APP_DESCRIPTION =
   'Дневник туриста — планируйте поездки, сохраняйте места и ведите дневник путешествий. Все данные хранятся только на вашем устройстве.';
 
+const CIRCLE_SIZE = 36;
+const CIRCLE_MARGIN = 10;
+
 export default function SettingsScreen() {
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, primaryColor, setPrimaryColor, isDark } = useTheme();
 
   const handleExportData = () => {
     Alert.alert(
@@ -40,7 +43,7 @@ export default function SettingsScreen() {
 
           {/* Данные */}
           <Card style={styles.card} mode="elevated">
-            <List.Section>
+            <List.Section style={styles.listSection}>
               <List.Subheader style={styles.listSubheader}>Данные</List.Subheader>
               <List.Item
                 title="Экспорт данных"
@@ -54,7 +57,7 @@ export default function SettingsScreen() {
 
           {/* Тема */}
           <Card style={styles.card} mode="elevated">
-            <List.Section>
+            <List.Section style={styles.listSection}>
               <List.Subheader style={styles.listSubheader}>Оформление</List.Subheader>
               <Paragraph style={styles.themeLabel}>Тема</Paragraph>
               <SegmentedButtons
@@ -69,12 +72,29 @@ export default function SettingsScreen() {
               <Paragraph style={styles.themeHint}>
                 В тёмной теме фоновое изображение отключено.
               </Paragraph>
+              <Paragraph style={styles.themeLabel}>Основной цвет темы</Paragraph>
+              <View style={styles.colorRow}>
+                {THEME_COLOR_PALETTE.map((color) => (
+                  <Pressable
+                    key={color}
+                    onPress={() => setPrimaryColor(color)}
+                    style={[
+                      styles.colorCircle,
+                      { backgroundColor: color },
+                      primaryColor === color && {
+                        ...styles.colorCircleSelected,
+                        borderColor: isDark ? 'rgba(255,255,255,0.9)' : '#333',
+                      },
+                    ]}
+                  />
+                ))}
+              </View>
             </List.Section>
           </Card>
 
           {/* Базовые настройки — заглушка для будущего */}
           <Card style={styles.card} mode="elevated">
-            <List.Section>
+            <List.Section style={styles.listSection}>
               <List.Subheader style={styles.listSubheader}>Настройки</List.Subheader>
               <List.Item
                 title="Дополнительные настройки"
@@ -125,6 +145,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
   },
+  listSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+  },
   listSubheader: {
     paddingHorizontal: 0,
   },
@@ -142,5 +166,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 4,
+  },
+  colorRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+    gap: CIRCLE_MARGIN,
+  },
+  colorCircle: {
+    width: CIRCLE_SIZE,
+    height: CIRCLE_SIZE,
+    borderRadius: CIRCLE_SIZE / 2,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  colorCircleSelected: {
+    borderWidth: 3,
   },
 });
