@@ -1,25 +1,25 @@
 import { View, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Title, Paragraph, List, SegmentedButtons } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import { ScreenBackground } from '../../components/ScreenBackground';
 import { useTheme, THEME_COLOR_PALETTE } from '../../contexts/ThemeContext';
 
 const APP_VERSION = '1.0.0';
 const APP_NAME = 'GoNext';
-const APP_DESCRIPTION =
-  'Дневник туриста — планируйте поездки, сохраняйте места и ведите дневник путешествий. Все данные хранятся только на вашем устройстве.';
 
 const CIRCLE_SIZE = 36;
 const CIRCLE_MARGIN = 10;
 
 export default function SettingsScreen() {
   const { theme, setTheme, primaryColor, setPrimaryColor, isDark } = useTheme();
+  const { t, i18n } = useTranslation();
 
   const handleExportData = () => {
     Alert.alert(
-      'Экспорт данных',
-      'Функция экспорта данных будет доступна в следующей версии. Вы сможете сохранить копию своих мест, поездок и фотографий.',
-      [{ text: 'Понятно' }]
+      t('settings.exportAlertTitle'),
+      t('settings.exportAlertMessage'),
+      [{ text: t('common.ok') }]
     );
   };
 
@@ -34,20 +34,20 @@ export default function SettingsScreen() {
           {/* О приложении */}
           <Card style={styles.card} mode="elevated">
             <Card.Content>
-              <Title style={styles.sectionTitle}>О приложении</Title>
+              <Title style={styles.sectionTitle}>{t('settings.aboutApp')}</Title>
               <Paragraph style={styles.appName}>{APP_NAME}</Paragraph>
-              <Paragraph style={styles.description}>{APP_DESCRIPTION}</Paragraph>
-              <Paragraph style={styles.version}>Версия {APP_VERSION}</Paragraph>
+              <Paragraph style={styles.description}>{t('settings.appDescription')}</Paragraph>
+              <Paragraph style={styles.version}>{t('settings.version', { version: APP_VERSION })}</Paragraph>
             </Card.Content>
           </Card>
 
           {/* Данные */}
           <Card style={styles.card} mode="elevated">
             <List.Section style={styles.listSection}>
-              <List.Subheader style={styles.listSubheader}>Данные</List.Subheader>
+              <List.Subheader style={styles.listSubheader}>{t('settings.data')}</List.Subheader>
               <List.Item
-                title="Экспорт данных"
-                description="Сохранение копии мест, поездок и фотографий (в разработке)"
+                title={t('settings.exportData')}
+                description={t('settings.exportDataDescription')}
                 left={(props) => <List.Icon {...props} icon="export" />}
                 onPress={handleExportData}
                 style={styles.listItem}
@@ -58,21 +58,19 @@ export default function SettingsScreen() {
           {/* Тема */}
           <Card style={styles.card} mode="elevated">
             <List.Section style={styles.listSection}>
-              <List.Subheader style={styles.listSubheader}>Оформление</List.Subheader>
-              <Paragraph style={styles.themeLabel}>Тема</Paragraph>
+              <List.Subheader style={styles.listSubheader}>{t('settings.appearance')}</List.Subheader>
+              <Paragraph style={styles.themeLabel}>{t('settings.theme')}</Paragraph>
               <SegmentedButtons
                 value={theme}
                 onValueChange={(v) => setTheme(v as 'light' | 'dark')}
                 buttons={[
-                  { value: 'light', label: 'Светлая', icon: 'white-balance-sunny' },
-                  { value: 'dark', label: 'Тёмная', icon: 'moon-waning-crescent' },
+                  { value: 'light', label: t('settings.themeLight'), icon: 'white-balance-sunny' },
+                  { value: 'dark', label: t('settings.themeDark'), icon: 'moon-waning-crescent' },
                 ]}
                 style={styles.segmented}
               />
-              <Paragraph style={styles.themeHint}>
-                В тёмной теме фоновое изображение отключено.
-              </Paragraph>
-              <Paragraph style={styles.themeLabel}>Основной цвет темы</Paragraph>
+              <Paragraph style={styles.themeHint}>{t('settings.themeHint')}</Paragraph>
+              <Paragraph style={styles.themeLabel}>{t('settings.primaryColor')}</Paragraph>
               <View style={styles.colorRow}>
                 {THEME_COLOR_PALETTE.map((color) => (
                   <Pressable
@@ -89,16 +87,26 @@ export default function SettingsScreen() {
                   />
                 ))}
               </View>
+              <Paragraph style={styles.themeLabel}>{t('settings.language')}</Paragraph>
+              <SegmentedButtons
+                value={i18n.language === 'en' ? 'en' : 'ru'}
+                onValueChange={(v) => i18n.changeLanguage(v)}
+                buttons={[
+                  { value: 'ru', label: t('settings.languageRu'), icon: 'translate' },
+                  { value: 'en', label: t('settings.languageEn'), icon: 'translate' },
+                ]}
+                style={styles.segmented}
+              />
             </List.Section>
           </Card>
 
           {/* Базовые настройки — заглушка для будущего */}
           <Card style={styles.card} mode="elevated">
             <List.Section style={styles.listSection}>
-              <List.Subheader style={styles.listSubheader}>Настройки</List.Subheader>
+              <List.Subheader style={styles.listSubheader}>{t('settings.moreSettings')}</List.Subheader>
               <List.Item
-                title="Дополнительные настройки"
-                description="Будут добавлены в следующих версиях"
+                title={t('settings.moreSettingsDescription')}
+                description={t('settings.moreSettingsHint')}
                 left={(props) => <List.Icon {...props} icon="cog-outline" />}
                 disabled
                 style={styles.listItem}

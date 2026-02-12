@@ -10,19 +10,21 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { getAllTripsWithPlacesCount, TripWithPlacesCount } from '../../services/tripsService';
 import { ScreenBackground } from '../../components/ScreenBackground';
 
-function formatDateRange(start: string | null, end: string | null): string {
-  if (!start && !end) return 'Даты не указаны';
-  if (start && !end) return `${start}`;
-  if (!start && end) return `${end}`;
-  return `${start} — ${end}`;
-}
-
 export default function TripsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [trips, setTrips] = useState<TripWithPlacesCount[]>([]);
+
+  function formatDateRange(start: string | null, end: string | null): string {
+    if (!start && !end) return t('trips.datesNotSet');
+    if (start && !end) return start;
+    if (!start && end) return end;
+    return `${start} — ${end}`;
+  }
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
@@ -72,7 +74,7 @@ export default function TripsScreen() {
           {trips.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Paragraph style={styles.emptyText}>
-                Нет поездок. Создайте первую поездку.
+                {t('trips.empty')}
               </Paragraph>
             </View>
           ) : (
@@ -100,7 +102,7 @@ export default function TripsScreen() {
                     {formatDateRange(trip.startDate, trip.endDate)}
                   </Paragraph>
                   <Paragraph style={styles.placesCount}>
-                    Мест в маршруте: {trip.placesCount}
+                    {t('trips.placesCount', { count: trip.placesCount })}
                   </Paragraph>
                 </Card.Content>
               </Card>

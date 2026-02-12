@@ -9,11 +9,13 @@ import {
   Paragraph,
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { createTrip, setCurrentTrip } from '../../services/tripsService';
 import { ScreenBackground } from '../../components/ScreenBackground';
 
 export default function NewTripScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -23,7 +25,7 @@ export default function NewTripScreen() {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      Alert.alert('Ошибка', 'Название поездки обязательно');
+      Alert.alert(t('common.error'), t('errors.tripTitleRequired'));
       return;
     }
 
@@ -44,7 +46,7 @@ export default function NewTripScreen() {
       router.replace(`/trips/${id}/details` as any);
     } catch (error) {
       console.error('Ошибка сохранения поездки:', error);
-      Alert.alert('Ошибка', 'Не удалось сохранить поездку');
+      Alert.alert(t('common.error'), t('errors.saveTrip'));
     } finally {
       setLoading(false);
     }
@@ -57,7 +59,7 @@ export default function NewTripScreen() {
           <Card style={styles.card}>
             <Card.Content>
               <TextInput
-                label="Название поездки *"
+                label={t('trips.titleLabel')}
                 value={title}
                 onChangeText={setTitle}
                 style={styles.input}
@@ -65,7 +67,7 @@ export default function NewTripScreen() {
               />
 
               <TextInput
-                label="Описание"
+                label={t('trips.descriptionLabel')}
                 value={description}
                 onChangeText={setDescription}
                 style={styles.input}
@@ -75,25 +77,25 @@ export default function NewTripScreen() {
               />
 
               <TextInput
-                label="Дата начала (ГГГГ-ММ-ДД)"
+                label={t('trips.startDateLabel')}
                 value={startDate}
                 onChangeText={setStartDate}
                 style={styles.input}
                 mode="outlined"
-                placeholder="2025-06-01"
+                placeholder={t('trips.startDatePlaceholder')}
               />
 
               <TextInput
-                label="Дата окончания (ГГГГ-ММ-ДД)"
+                label={t('trips.endDateLabel')}
                 value={endDate}
                 onChangeText={setEndDate}
                 style={styles.input}
                 mode="outlined"
-                placeholder="2025-06-15"
+                placeholder={t('trips.endDatePlaceholder')}
               />
 
               <View style={styles.switchContainer}>
-                <Paragraph>Текущая поездка</Paragraph>
+                <Paragraph>{t('trips.currentTrip')}</Paragraph>
                 <Switch value={current} onValueChange={setCurrent} />
               </View>
 
@@ -105,7 +107,7 @@ export default function NewTripScreen() {
                   loading={loading}
                   disabled={loading || !title.trim()}
                 >
-                  Создать
+                  {t('common.create')}
                 </Button>
 
                 <Button
@@ -114,7 +116,7 @@ export default function NewTripScreen() {
                   style={styles.cancelButton}
                   disabled={loading}
                 >
-                  Отмена
+                  {t('common.cancel')}
                 </Button>
               </View>
             </Card.Content>

@@ -10,12 +10,14 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { getTripById, updateTrip, setCurrentTrip } from '../../../services/tripsService';
 import { ScreenBackground } from '../../../components/ScreenBackground';
 
 export default function EditTripScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [startDate, setStartDate] = useState('');
@@ -55,7 +57,7 @@ export default function EditTripScreen() {
   const handleSave = async () => {
     if (!id || id === 'new') return;
     if (!title.trim()) {
-      Alert.alert('Ошибка', 'Название поездки обязательно');
+      Alert.alert(t('common.error'), t('errors.tripTitleRequired'));
       return;
     }
 
@@ -77,7 +79,7 @@ export default function EditTripScreen() {
       router.back();
     } catch (error) {
       console.error('Ошибка сохранения поездки:', error);
-      Alert.alert('Ошибка', 'Не удалось сохранить поездку');
+      Alert.alert(t('common.error'), t('errors.saveTrip'));
     } finally {
       setLoading(false);
     }
@@ -100,8 +102,8 @@ export default function EditTripScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScreenBackground>
           <View style={styles.emptyContainer}>
-            <Paragraph>Поездка не найдена</Paragraph>
-            <Button onPress={() => router.back()}>Назад</Button>
+            <Paragraph>{t('trips.tripNotFound')}</Paragraph>
+            <Button onPress={() => router.back()}>{t('common.back')}</Button>
           </View>
         </ScreenBackground>
       </SafeAreaView>
@@ -115,7 +117,7 @@ export default function EditTripScreen() {
           <Card style={styles.card}>
             <Card.Content>
               <TextInput
-                label="Название поездки *"
+                label={t('trips.titleLabel')}
                 value={title}
                 onChangeText={setTitle}
                 style={styles.input}
@@ -123,7 +125,7 @@ export default function EditTripScreen() {
               />
 
               <TextInput
-                label="Описание"
+                label={t('trips.descriptionLabel')}
                 value={description}
                 onChangeText={setDescription}
                 style={styles.input}
@@ -138,7 +140,7 @@ export default function EditTripScreen() {
                 onChangeText={setStartDate}
                 style={styles.input}
                 mode="outlined"
-                placeholder="2025-06-01"
+                placeholder={t('trips.startDatePlaceholder')}
               />
 
               <TextInput
@@ -147,7 +149,7 @@ export default function EditTripScreen() {
                 onChangeText={setEndDate}
                 style={styles.input}
                 mode="outlined"
-                placeholder="2025-06-15"
+                placeholder={t('trips.endDatePlaceholder')}
               />
 
               <View style={styles.switchContainer}>
@@ -163,7 +165,7 @@ export default function EditTripScreen() {
                   loading={loading}
                   disabled={loading || !title.trim()}
                 >
-                  Сохранить
+                  {t('common.save')}
                 </Button>
 
                 <Button
@@ -172,7 +174,7 @@ export default function EditTripScreen() {
                   style={styles.cancelButton}
                   disabled={loading}
                 >
-                  Отмена
+                  {t('common.cancel')}
                 </Button>
               </View>
             </Card.Content>

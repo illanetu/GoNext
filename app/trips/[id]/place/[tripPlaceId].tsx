@@ -11,6 +11,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import {
   getTripPlaceWithDetails,
   addNotesToTripPlace,
@@ -29,6 +30,7 @@ import { ScreenBackground } from '../../../../components/ScreenBackground';
 
 export default function TripPlaceScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { id: tripIdParam, tripPlaceId } = useLocalSearchParams<{
     id: string;
     tripPlaceId: string;
@@ -46,7 +48,7 @@ export default function TripPlaceScreen() {
       if (data) setNotes(data.notes);
     } catch (error) {
       console.error('Ошибка загрузки:', error);
-      Alert.alert('Ошибка', 'Не удалось загрузить место');
+      Alert.alert(t('common.error'), t('errors.loadPlace'));
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function TripPlaceScreen() {
       await addNotesToTripPlace(parseInt(tripPlaceId), notes);
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось сохранить заметки');
+      Alert.alert(t('common.error'), t('errors.saveNotes'));
     } finally {
       setNotesSaving(false);
     }
@@ -81,7 +83,7 @@ export default function TripPlaceScreen() {
 
   const handleOpenMap = () => {
     if (!item?.place?.latitude || !item?.place?.longitude) {
-      Alert.alert('Ошибка', 'Координаты места не указаны');
+      Alert.alert(t('common.error'), t('common.coordinatesNotSet'));
       return;
     }
     openInMaps(item.place.latitude, item.place.longitude);
@@ -89,7 +91,7 @@ export default function TripPlaceScreen() {
 
   const handleOpenNavigator = () => {
     if (!item?.place?.latitude || !item?.place?.longitude) {
-      Alert.alert('Ошибка', 'Координаты места не указаны');
+      Alert.alert(t('common.error'), t('common.coordinatesNotSet'));
       return;
     }
     openInNavigator(item.place.latitude, item.place.longitude);
@@ -101,7 +103,7 @@ export default function TripPlaceScreen() {
       await addPhotoToTripPlace(parseInt(tripPlaceId), uri);
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось добавить фотографию');
+      Alert.alert(t('common.error'), t('errors.addPhoto'));
     }
   };
 
@@ -116,7 +118,7 @@ export default function TripPlaceScreen() {
       }
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось удалить фотографию');
+      Alert.alert(t('common.error'), t('errors.deletePhoto'));
     }
   };
 
@@ -137,8 +139,8 @@ export default function TripPlaceScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScreenBackground>
           <View style={styles.emptyContainer}>
-            <Paragraph>Место не найдено</Paragraph>
-            <Button onPress={() => router.back()}>Назад</Button>
+            <Paragraph>{t('tripPlace.placeNotFound')}</Paragraph>
+            <Button onPress={() => router.back()}>{t('common.back')}</Button>
           </View>
         </ScreenBackground>
       </SafeAreaView>
@@ -157,7 +159,7 @@ export default function TripPlaceScreen() {
 
               {item.visited && (
                 <Chip icon="check-circle" style={styles.visitedChip}>
-                  Посещено
+                  {t('trips.visited')}
                   {item.visitDate ? ` ${item.visitDate}` : ''}
                 </Chip>
               )}
@@ -168,7 +170,7 @@ export default function TripPlaceScreen() {
                 icon={item.visited ? 'circle-outline' : 'check-circle'}
                 style={styles.visitedButton}
               >
-                {item.visited ? 'Снять отметку о посещении' : 'Отметить как посещенное'}
+                {item.visited ? t('tripPlace.unmarkVisited') : t('tripPlace.markVisited')}
               </Button>
 
               {place.description ? (
@@ -187,7 +189,7 @@ export default function TripPlaceScreen() {
                   </View>
                   <View style={styles.buttonsRow}>
                     <Button mode="contained" onPress={handleOpenMap} icon="map" style={styles.btn}>
-                      На карте
+                      {t('places.openOnMap')}
                     </Button>
                     <Button
                       mode="outlined"
@@ -195,7 +197,7 @@ export default function TripPlaceScreen() {
                       icon="navigation"
                       style={styles.btn}
                     >
-                      Навигатор
+                      {t('places.openInNavigator')}
                     </Button>
                   </View>
                 </>
@@ -205,7 +207,7 @@ export default function TripPlaceScreen() {
 
           <Card style={styles.card}>
             <Card.Content>
-              <Title>Заметки о посещении</Title>
+              <Title>{t('tripPlace.visitNotes')}</Title>
               <TextInput
                 value={notes}
                 onChangeText={setNotes}
@@ -213,7 +215,7 @@ export default function TripPlaceScreen() {
                 multiline
                 numberOfLines={4}
                 style={styles.notesInput}
-                placeholder="Заметки о поездке..."
+                placeholder={t('tripPlace.notesPlaceholder')}
               />
               <Button
                 mode="contained-tonal"
@@ -221,7 +223,7 @@ export default function TripPlaceScreen() {
                 loading={notesSaving}
                 style={styles.saveNotesBtn}
               >
-                Сохранить заметки
+                {t('tripPlace.saveNotes')}
               </Button>
             </Card.Content>
           </Card>
@@ -229,16 +231,16 @@ export default function TripPlaceScreen() {
           <Card style={styles.card}>
             <Card.Content>
               <View style={styles.photosHeader}>
-                <Title>Фотографии</Title>
+                <Title>{t('places.photos')}</Title>
               </View>
               {item.photos.length === 0 && (
-                <Paragraph style={styles.emptyText}>Нет фотографий</Paragraph>
+                <Paragraph style={styles.emptyText}>{t('places.noPhotos')}</Paragraph>
               )}
               <PhotoGallery
                 photos={item.photos}
                 onPhotoSelected={handleAddPhoto}
                 onDeletePhoto={handleDeletePhoto}
-                onError={(msg) => Alert.alert('Ошибка', msg)}
+                onError={(msg) => Alert.alert(t('common.error'), msg)}
               />
             </Card.Content>
           </Card>

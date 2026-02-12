@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button, IconButton } from 'react-native-paper';
+import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 
 interface PhotoPickerProps {
@@ -19,12 +20,14 @@ export function PhotoPicker({
   onPhotoSelected,
   onError,
   mode = 'button',
-  label = 'Добавить фото',
+  label,
 }: PhotoPickerProps) {
+  const { t } = useTranslation();
+
   const handlePress = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      onError?.('Нужно разрешение на доступ к фотографиям');
+      onError?.(t('errors.photoPermission'));
       return;
     }
 
@@ -52,7 +55,7 @@ export function PhotoPicker({
 
   return (
     <Button mode="text" onPress={handlePress} icon="plus">
-      {label}
+      {label ?? t('photoPicker.addPhoto')}
     </Button>
   );
 }

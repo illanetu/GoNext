@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { getAllPlaces } from '../../../services/placesService';
 import type { Place } from '../../../types';
 import { getTripPlaces, addPlaceToTrip } from '../../../services/tripPlacesService';
@@ -18,6 +19,7 @@ import { ScreenBackground } from '../../../components/ScreenBackground';
 export default function AddPlaceToTripScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation();
   const [places, setPlaces] = useState<Place[]>([]);
   const [inTripPlaceIds, setInTripPlaceIds] = useState<number[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -52,7 +54,7 @@ export default function AddPlaceToTripScreen() {
         }
       } catch (error) {
         console.error('Ошибка загрузки мест:', error);
-        Alert.alert('Ошибка', 'Не удалось загрузить список мест');
+        Alert.alert(t('common.error'), t('errors.loadPlacesList'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -71,7 +73,7 @@ export default function AddPlaceToTripScreen() {
       await addPlaceToTrip(tripId, placeId);
       setInTripPlaceIds((prev) => [...prev, placeId]);
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось добавить место в поездку');
+      Alert.alert(t('common.error'), t('errors.addPlaceToTrip'));
     } finally {
       setAddingId(null);
     }
@@ -101,7 +103,7 @@ export default function AddPlaceToTripScreen() {
       <ScreenBackground>
         <View style={styles.searchContainer}>
           <Searchbar
-            placeholder="Поиск мест..."
+            placeholder={t('addPlaceToTrip.searchPlaceholder')}
             onChangeText={setSearchQuery}
             value={searchQuery}
             style={styles.searchbar}
@@ -118,15 +120,15 @@ export default function AddPlaceToTripScreen() {
             onPress={handleCreateNewPlace}
             style={styles.newPlaceButton}
           >
-            Создать новое место
+            {t('addPlaceToTrip.createNew')}
           </Button>
 
           {filteredPlaces.length === 0 ? (
             <View style={styles.emptyContainer}>
               <Paragraph style={styles.emptyText}>
                 {searchQuery
-                  ? 'Места не найдены'
-                  : 'Все ваши места уже добавлены в поездку или список мест пуст'}
+                  ? t('addPlaceToTrip.emptySearch')
+                  : t('addPlaceToTrip.emptyAllAdded')}
               </Paragraph>
             </View>
           ) : (
@@ -148,7 +150,7 @@ export default function AddPlaceToTripScreen() {
                       loading={addingId === place.id}
                       disabled={addingId !== null}
                     >
-                      Добавить
+                      {t('common.add')}
                     </Button>
                   </View>
                 </Card.Content>

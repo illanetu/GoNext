@@ -18,6 +18,7 @@ import {
   FAB,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { getTripById, setCurrentTrip, deleteTrip } from '../../../services/tripsService';
 import {
   getTripPlacesWithDetails,
@@ -30,16 +31,17 @@ import type { Trip } from '../../../types';
 import { TripMapView } from '../../../components/TripMapView';
 import { ScreenBackground } from '../../../components/ScreenBackground';
 
-function formatDateRange(start: string | null, end: string | null): string {
-  if (!start && !end) return 'Даты не указаны';
-  if (start && !end) return start;
-  if (!start && end) return end;
-  return `${start} — ${end}`;
-}
-
 export default function TripDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation();
+
+  function formatDateRange(start: string | null, end: string | null): string {
+    if (!start && !end) return t('trips.datesNotSet');
+    if (start && !end) return start;
+    if (!start && end) return end;
+    return `${start} — ${end}`;
+  }
   const [trip, setTrip] = useState<Trip | null>(null);
   const [places, setPlaces] = useState<TripPlaceWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,7 +59,7 @@ export default function TripDetailsScreen() {
       setPlaces(placesData);
     } catch (error) {
       console.error('Ошибка загрузки поездки:', error);
-      Alert.alert('Ошибка', 'Не удалось загрузить поездку');
+      Alert.alert(t('common.error'), t('errors.loadTrip'));
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -79,7 +81,7 @@ export default function TripDetailsScreen() {
       await setCurrentTrip(trip.id);
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось установить текущую поездку');
+      Alert.alert(t('common.error'), t('errors.setCurrentTrip'));
     }
   };
 
@@ -115,7 +117,7 @@ export default function TripDetailsScreen() {
       await updatePlaceOrder(parseInt(id!), prev.id, index);
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось изменить порядок');
+      Alert.alert(t('common.error'), t('errors.changeOrder'));
     }
   };
 
@@ -128,7 +130,7 @@ export default function TripDetailsScreen() {
       await updatePlaceOrder(parseInt(id!), next.id, index);
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось изменить порядок');
+      Alert.alert(t('common.error'), t('errors.changeOrder'));
     }
   };
 
@@ -137,25 +139,25 @@ export default function TripDetailsScreen() {
       await markPlaceAsVisited(tp.id, !tp.visited);
       await loadData();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось обновить статус');
+      Alert.alert(t('common.error'), t('errors.updateStatus'));
     }
   };
 
   const handleRemovePlace = (tp: TripPlaceWithDetails) => {
     Alert.alert(
-      'Удалить из маршрута',
-      `Убрать "${tp.place.name}" из поездки?`,
+      t('trips.removeFromRoute'),
+      t('trips.removeFromRouteMessage', { name: tp.place.name }),
       [
-        { text: 'Отмена', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Убрать',
+          text: t('common.remove'),
           style: 'destructive',
           onPress: async () => {
             try {
               await removePlaceFromTrip(parseInt(id!), tp.id);
               await loadData();
             } catch (error) {
-              Alert.alert('Ошибка', 'Не удалось убрать место');
+              Alert.alert(t('common.error'), t('errors.removePlace'));
             }
           },
         },
@@ -180,8 +182,8 @@ export default function TripDetailsScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScreenBackground>
           <View style={styles.emptyContainer}>
-            <Paragraph>Поездка не найдена</Paragraph>
-            <Button onPress={() => router.back()}>Назад</Button>
+            <Paragraph>{t('trips.tripNotFound')}</Paragraph>
+            <Button onPress={() => router.back()}>{t('common.back')}</Button>
           </View>
         </ScreenBackground>
       </SafeAreaView>
@@ -229,7 +231,7 @@ export default function TripDetailsScreen() {
               )}
               {trip.current && (
                 <Chip icon="map-marker" style={styles.chipCurrent}>
-                  Текущая поездка
+                  {t('trips.currentTrip')}
                 </Chip>
               )}
 
@@ -245,7 +247,7 @@ export default function TripDetailsScreen() {
           {places.length > 0 && (
             <Card style={styles.card}>
               <Card.Content>
-                <Title style={styles.mapTitle}>Карта маршрута</Title>
+                <Title style={styles.mapTitle}>{t('trips.routeMap')}</Title>
                 <TripMapView places={places} height={220} />
               </Card.Content>
             </Card>
@@ -266,7 +268,7 @@ export default function TripDetailsScreen() {
 
               {places.length === 0 ? (
                 <Paragraph style={styles.emptyText}>
-                  В маршруте пока нет мест. Добавьте места из списка или создайте новое.
+                  {t('trips.routeEmpty')}
                 </Paragraph>
               ) : (
                 places.map((tp, index) => (
@@ -304,7 +306,7 @@ export default function TripDetailsScreen() {
                             </Paragraph>
                             {tp.visited && (
                               <Chip compact style={styles.visitedChip}>
-                                Посещено
+                                {t('trips.visited')}
                               </Chip>
                             )}
                           </View>
@@ -340,7 +342,7 @@ export default function TripDetailsScreen() {
           icon="pencil"
           style={styles.fab}
           onPress={() => router.push(`/trips/${id}/edit` as any)}
-          label="Редактировать"
+          label={t('common.edit')}
         />
       </ScreenBackground>
     </SafeAreaView>

@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { createPlace } from '../../services/placesService';
 import { addPlaceToTrip } from '../../services/tripPlacesService';
 import { MapPicker } from '../../components/MapPicker';
@@ -17,6 +18,7 @@ import { ScreenBackground } from '../../components/ScreenBackground';
 
 export default function NewPlaceScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { tripId } = useLocalSearchParams<{ tripId?: string }>();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -44,7 +46,7 @@ export default function NewPlaceScreen() {
 
   const handleSave = async () => {
     if (!name.trim()) {
-      Alert.alert('Ошибка', 'Название места обязательно');
+      Alert.alert(t('common.error'), t('errors.placeNameRequired'));
       return;
     }
 
@@ -68,7 +70,7 @@ export default function NewPlaceScreen() {
       }
     } catch (error) {
       console.error('Ошибка сохранения места:', error);
-      Alert.alert('Ошибка', 'Не удалось сохранить место');
+      Alert.alert(t('common.error'), t('errors.savePlace'));
     } finally {
       setLoading(false);
     }
@@ -81,7 +83,7 @@ export default function NewPlaceScreen() {
         <Card style={styles.card}>
           <Card.Content>
             <TextInput
-              label="Название места *"
+              label={t('places.nameLabel')}
               value={name}
               onChangeText={setName}
               style={styles.input}
@@ -89,7 +91,7 @@ export default function NewPlaceScreen() {
             />
 
             <TextInput
-              label="Описание"
+              label={t('places.descriptionLabel')}
               value={description}
               onChangeText={setDescription}
               style={styles.input}
@@ -99,17 +101,17 @@ export default function NewPlaceScreen() {
             />
 
             <View style={styles.switchContainer}>
-              <Paragraph>Посетить позже</Paragraph>
+              <Paragraph>{t('places.visitLater')}</Paragraph>
               <Switch value={visitlater} onValueChange={setVisitlater} />
             </View>
 
             <View style={styles.switchContainer}>
-              <Paragraph>Понравилось</Paragraph>
+              <Paragraph>{t('places.liked')}</Paragraph>
               <Switch value={liked} onValueChange={setLiked} />
             </View>
 
             <View style={styles.coordinatesSection}>
-              <Paragraph style={styles.sectionTitle}>Координаты (необязательно)</Paragraph>
+              <Paragraph style={styles.sectionTitle}>{t('places.coordinatesSection')}</Paragraph>
 
               <View style={styles.mapPickerWrap}>
                 <MapPicker
@@ -121,7 +123,7 @@ export default function NewPlaceScreen() {
               </View>
 
               <TextInput
-                label="Широта, долгота (или введите вручную)"
+                label={t('places.coordinatesPlaceholder')}
                 value={coordinates}
                 onChangeText={(v) => {
                   setCoordinates(v);
@@ -131,7 +133,7 @@ export default function NewPlaceScreen() {
                 }}
                 style={styles.input}
                 mode="outlined"
-                placeholder="42.855194, 131.419915"
+                placeholder={t('places.coordinatesExample')}
               />
             </View>
 
@@ -143,7 +145,7 @@ export default function NewPlaceScreen() {
                 loading={loading}
                 disabled={loading || !name.trim()}
               >
-                Сохранить
+                {t('common.save')}
               </Button>
 
               <Button
@@ -152,7 +154,7 @@ export default function NewPlaceScreen() {
                 style={styles.cancelButton}
                 disabled={loading}
               >
-                Отмена
+                {t('common.cancel')}
               </Button>
             </View>
           </Card.Content>

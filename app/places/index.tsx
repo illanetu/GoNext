@@ -12,12 +12,14 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { getAllPlaces } from '../../services/placesService';
 import type { Place } from '../../types';
 import { ScreenBackground } from '../../components/ScreenBackground';
 
 export default function PlacesScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [places, setPlaces] = useState<Place[]>([]);
   const [filteredPlaces, setFilteredPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
@@ -79,7 +81,7 @@ export default function PlacesScreen() {
       <ScreenBackground>
       <View style={styles.searchContainer}>
         <Searchbar
-          placeholder="Поиск мест..."
+          placeholder={t('places.searchPlaceholder')}
           onChangeText={setSearchQuery}
           value={searchQuery}
           style={styles.searchbar}
@@ -96,7 +98,7 @@ export default function PlacesScreen() {
         {filteredPlaces.length === 0 ? (
           <View style={styles.emptyContainer}>
             <Paragraph style={styles.emptyText}>
-              {searchQuery ? 'Места не найдены' : 'Нет сохраненных мест'}
+              {searchQuery ? t('places.emptySearch') : t('places.empty')}
             </Paragraph>
           </View>
         ) : (
@@ -112,12 +114,12 @@ export default function PlacesScreen() {
                   <View style={styles.chipsContainer}>
                     {place.visitlater && (
                       <Chip icon="clock-outline" style={styles.chip}>
-                        Позже
+                        {t('places.visitLater')}
                       </Chip>
                     )}
                     {place.liked && (
                       <Chip icon="heart" style={styles.chip}>
-                        Понравилось
+                        {t('places.liked')}
                       </Chip>
                     )}
                   </View>

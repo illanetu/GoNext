@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 import { getNextPlace } from '../../services/nextPlaceService';
 import { markPlaceAsVisited } from '../../services/tripPlacesService';
 import type { TripPlaceWithDetails } from '../../types';
@@ -19,6 +20,7 @@ import { PhotoGallery } from '../../components/PhotoGallery';
 import { ScreenBackground } from '../../components/ScreenBackground';
 
 export default function NextPlaceScreen() {
+  const { t } = useTranslation();
   const [item, setItem] = useState<TripPlaceWithDetails | null | undefined>(
     undefined
   );
@@ -46,7 +48,7 @@ export default function NextPlaceScreen() {
 
   const handleOpenMap = () => {
     if (!item?.place?.latitude || !item?.place?.longitude) {
-      Alert.alert('Ошибка', 'Координаты места не указаны');
+      Alert.alert(t('common.error'), t('common.coordinatesNotSet'));
       return;
     }
     openInMaps(item.place.latitude, item.place.longitude);
@@ -54,7 +56,7 @@ export default function NextPlaceScreen() {
 
   const handleOpenNavigator = () => {
     if (!item?.place?.latitude || !item?.place?.longitude) {
-      Alert.alert('Ошибка', 'Координаты места не указаны');
+      Alert.alert(t('common.error'), t('common.coordinatesNotSet'));
       return;
     }
     openInNavigator(item.place.latitude, item.place.longitude);
@@ -66,7 +68,7 @@ export default function NextPlaceScreen() {
       await markPlaceAsVisited(item.id, true);
       await loadNextPlace();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось отметить место как посещённое');
+      Alert.alert(t('common.error'), t('errors.markVisited'));
     }
   };
 
@@ -89,13 +91,12 @@ export default function NextPlaceScreen() {
           <View style={styles.emptyContainer}>
             <Card style={styles.card}>
               <Card.Content>
-                <Title style={styles.emptyTitle}>Следующее место</Title>
+                <Title style={styles.emptyTitle}>{t('nextPlace.title')}</Title>
                 <Paragraph style={styles.emptyText}>
-                  Нет следующего места для посещения.
+                  {t('nextPlace.empty')}
                 </Paragraph>
                 <Paragraph style={styles.hint}>
-                  Выберите текущую поездку в разделе «Поездки» и добавьте в неё
-                  места. Следующим будет первое непосещённое место в маршруте.
+                  {t('nextPlace.hint')}
                 </Paragraph>
               </Card.Content>
             </Card>
@@ -122,12 +123,12 @@ export default function NextPlaceScreen() {
               <View style={styles.chipsContainer}>
                 {place.visitlater && (
                   <Chip icon="clock-outline" style={styles.chip}>
-                    Посетить позже
+                    {t('places.visitLater')}
                   </Chip>
                 )}
                 {place.liked && (
                   <Chip icon="heart" style={styles.chip}>
-                    Понравилось
+                    {t('places.liked')}
                   </Chip>
                 )}
               </View>
@@ -161,7 +162,7 @@ export default function NextPlaceScreen() {
                       icon="map"
                       style={styles.button}
                     >
-                      Открыть на карте
+                      {t('places.openOnMap')}
                     </Button>
                     <Button
                       mode="outlined"
@@ -169,7 +170,7 @@ export default function NextPlaceScreen() {
                       icon="navigation"
                       style={styles.button}
                     >
-                      Открыть в навигаторе
+                      {t('places.openInNavigator')}
                     </Button>
                   </>
                 )}
@@ -179,7 +180,7 @@ export default function NextPlaceScreen() {
                   icon="check-circle"
                   style={styles.button}
                 >
-                  Отметить как посещённое
+                  {t('nextPlace.markVisited')}
                 </Button>
               </View>
             </Card.Content>
@@ -188,7 +189,7 @@ export default function NextPlaceScreen() {
           {photos.length > 0 && (
             <Card style={styles.card}>
               <Card.Content>
-                <Title style={styles.sectionTitle}>Фотографии</Title>
+                <Title style={styles.sectionTitle}>{t('places.photos')}</Title>
                 <PhotoGallery
                   photos={photos}
                   allowDelete={false}

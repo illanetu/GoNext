@@ -11,6 +11,7 @@ import {
   IconButton,
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { getPlaceWithPhotos, deletePlace } from '../../services/placesService';
 import type { PlaceWithPhotos } from '../../types';
 import { addPhotoToPlace, removePhotoFromPlace } from '../../services/photosService';
@@ -22,6 +23,7 @@ import { ScreenBackground } from '../../components/ScreenBackground';
 export default function PlaceDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { t } = useTranslation();
   const [place, setPlace] = useState<PlaceWithPhotos | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +38,7 @@ export default function PlaceDetailsScreen() {
       setPlace(placeData);
     } catch (error) {
       console.error('Ошибка загрузки места:', error);
-      Alert.alert('Ошибка', 'Не удалось загрузить место');
+      Alert.alert(t('common.error'), t('errors.loadPlace'));
     } finally {
       setLoading(false);
     }
@@ -48,19 +50,19 @@ export default function PlaceDetailsScreen() {
 
   const handleDelete = () => {
     Alert.alert(
-      'Удаление места',
-      'Вы уверены, что хотите удалить это место?',
+      t('places.deletePlaceTitle'),
+      t('places.deletePlaceMessage'),
       [
-        { text: 'Отмена', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
         {
-          text: 'Удалить',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: async () => {
             try {
               await deletePlace(parseInt(id!));
               router.back();
             } catch (error) {
-              Alert.alert('Ошибка', 'Не удалось удалить место');
+              Alert.alert(t('common.error'), t('errors.deletePlace'));
             }
           },
         },
@@ -70,7 +72,7 @@ export default function PlaceDetailsScreen() {
 
   const handleOpenMap = () => {
     if (!place || !place.latitude || !place.longitude) {
-      Alert.alert('Ошибка', 'Координаты места не указаны');
+      Alert.alert(t('common.error'), t('common.coordinatesNotSet'));
       return;
     }
     openInMaps(place.latitude, place.longitude);
@@ -78,7 +80,7 @@ export default function PlaceDetailsScreen() {
 
   const handleOpenNavigator = () => {
     if (!place || !place.latitude || !place.longitude) {
-      Alert.alert('Ошибка', 'Координаты места не указаны');
+      Alert.alert(t('common.error'), t('common.coordinatesNotSet'));
       return;
     }
     openInNavigator(place.latitude, place.longitude);
@@ -91,7 +93,7 @@ export default function PlaceDetailsScreen() {
       await loadPlace();
     } catch (error) {
       console.error('Ошибка добавления фото:', error);
-      Alert.alert('Ошибка', 'Не удалось добавить фотографию');
+      Alert.alert(t('common.error'), t('errors.addPhoto'));
     }
   };
 
@@ -100,7 +102,7 @@ export default function PlaceDetailsScreen() {
       await removePhotoFromPlace(photoId);
       await loadPlace();
     } catch (error) {
-      Alert.alert('Ошибка', 'Не удалось удалить фотографию');
+      Alert.alert(t('common.error'), t('errors.deletePhoto'));
     }
   };
 
@@ -121,8 +123,8 @@ export default function PlaceDetailsScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScreenBackground>
         <View style={styles.emptyContainer}>
-          <Paragraph>Место не найдено</Paragraph>
-          <Button onPress={() => router.back()}>Назад</Button>
+          <Paragraph>{t('places.placeNotFound')}</Paragraph>
+          <Button onPress={() => router.back()}>{t('common.back')}</Button>
         </View>
         </ScreenBackground>
       </SafeAreaView>
@@ -148,12 +150,12 @@ export default function PlaceDetailsScreen() {
             <View style={styles.chipsContainer}>
               {place.visitlater && (
                 <Chip icon="clock-outline" style={styles.chip}>
-                  Посетить позже
+                  {t('places.visitLater')}
                 </Chip>
               )}
               {place.liked && (
                 <Chip icon="heart" style={styles.chip}>
-                  Понравилось
+                  {t('places.liked')}
                 </Chip>
               )}
             </View>
@@ -166,7 +168,7 @@ export default function PlaceDetailsScreen() {
               <>
                 <View style={styles.coordinatesContainer}>
                   <Paragraph style={styles.coordinates}>
-                    📍 Координаты: {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
+                    📍 {t('places.coordinatesLabel')}: {place.latitude.toFixed(6)}, {place.longitude.toFixed(6)}
                   </Paragraph>
                 </View>
                 <View style={styles.mapContainer}>
@@ -189,7 +191,7 @@ export default function PlaceDetailsScreen() {
                     icon="map"
                     style={styles.button}
                   >
-                    Открыть на карте
+                    {t('places.openOnMap')}
                   </Button>
                   <Button
                     mode="outlined"
@@ -197,7 +199,7 @@ export default function PlaceDetailsScreen() {
                     icon="navigation"
                     style={styles.button}
                   >
-                    Открыть в навигаторе
+                    {t('places.openInNavigator')}
                   </Button>
                 </>
               )}
@@ -208,16 +210,16 @@ export default function PlaceDetailsScreen() {
         <Card style={styles.card}>
           <Card.Content>
             <View style={styles.photosHeader}>
-              <Title>Фотографии</Title>
+              <Title>{t('places.photos')}</Title>
             </View>
             {place.photos.length === 0 && (
-              <Paragraph style={styles.emptyHint}>Нет фотографий</Paragraph>
+              <Paragraph style={styles.emptyHint}>{t('places.noPhotos')}</Paragraph>
             )}
             <PhotoGallery
               photos={place.photos}
               onPhotoSelected={handleAddPhoto}
               onDeletePhoto={handleDeletePhoto}
-              onError={(msg) => Alert.alert('Ошибка', msg)}
+              onError={(msg) => Alert.alert(t('common.error'), msg)}
             />
           </Card.Content>
         </Card>

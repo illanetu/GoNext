@@ -2,17 +2,19 @@ import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, Button, Card, Title, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ScreenBackground } from '../components/ScreenBackground';
-
-const navItems = [
-  { href: '/places', label: 'Места', icon: 'map-marker' },
-  { href: '/trips', label: 'Поездки', icon: 'map' },
-  { href: '/next-place', label: 'Следующее место', icon: 'compass-outline' },
-  { href: '/settings', label: 'Настройки', icon: 'cog-outline' },
-] as const;
 
 export default function Home() {
   const router = useRouter();
+  const { t } = useTranslation();
+
+  const navItems = [
+    { href: '/places', label: t('nav.places'), icon: 'map-marker' },
+    { href: '/trips', label: t('nav.trips'), icon: 'map' },
+    { href: '/next-place', label: t('nav.nextPlace'), icon: 'compass-outline' },
+    { href: '/settings', label: t('nav.settings'), icon: 'cog-outline' },
+  ];
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -26,7 +28,7 @@ export default function Home() {
             <Card.Content>
               <Title style={styles.appTitle}>GoNext</Title>
               <Text variant="bodyLarge" style={styles.subtitle}>
-                Дневник туриста
+                {t('home.subtitle')}
               </Text>
             </Card.Content>
           </Card>
