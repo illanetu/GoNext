@@ -106,6 +106,8 @@
     "themeDark": "Dark",
     "themeHint": "Background image is disabled in dark theme.",
     "primaryColor": "Primary theme color",
+    "backgroundImage": "Background image",
+    "backgroundImageHint": "Light theme only.",
     "moreSettings": "Settings",
     "moreSettingsDescription": "Additional settings",
     "moreSettingsHint": "Coming in future versions",

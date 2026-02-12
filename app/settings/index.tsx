@@ -1,18 +1,28 @@
-import { View, StyleSheet, ScrollView, Alert, Pressable } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, Pressable, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Card, Title, Paragraph, List, SegmentedButtons } from 'react-native-paper';
 import { useTranslation } from 'react-i18next';
 import { ScreenBackground } from '../../components/ScreenBackground';
 import { useTheme, THEME_COLOR_PALETTE } from '../../contexts/ThemeContext';
+import type { BackgroundImageIndex } from '../../contexts/ThemeContext';
 
 const APP_VERSION = '1.0.0';
 const APP_NAME = 'GoNext';
 
 const CIRCLE_SIZE = 36;
 const CIRCLE_MARGIN = 10;
+const BG_PREVIEW_SIZE = 72;
+const BG_PREVIEW_GAP = 10;
+
+const BACKGROUND_IMAGES: Record<BackgroundImageIndex, number> = {
+  0: require('../../assets/backgrounds/gonext-bg.png'),
+  1: require('../../assets/backgrounds/gonext-bg2.png'),
+  2: require('../../assets/backgrounds/gonext-bg3.png'),
+  3: require('../../assets/backgrounds/gonext-bg4.png'),
+};
 
 export default function SettingsScreen() {
-  const { theme, setTheme, primaryColor, setPrimaryColor, isDark } = useTheme();
+  const { theme, setTheme, primaryColor, setPrimaryColor, isDark, backgroundImageIndex, setBackgroundImageIndex } = useTheme();
   const { t, i18n } = useTranslation();
 
   const handleExportData = () => {
@@ -87,6 +97,29 @@ export default function SettingsScreen() {
                   />
                 ))}
               </View>
+              <Paragraph style={styles.themeLabel}>{t('settings.backgroundImage')}</Paragraph>
+              <View style={styles.backgroundRow}>
+                {([0, 1, 2, 3] as const).map((index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => setBackgroundImageIndex(index)}
+                    style={[
+                      styles.backgroundPreview,
+                      backgroundImageIndex === index && {
+                        ...styles.backgroundPreviewSelected,
+                        borderColor: isDark ? 'rgba(255,255,255,0.9)' : '#333',
+                      },
+                    ]}
+                  >
+                    <ImageBackground
+                      source={BACKGROUND_IMAGES[index]}
+                      style={styles.backgroundPreviewImage}
+                      resizeMode="cover"
+                    />
+                  </Pressable>
+                ))}
+              </View>
+              <Paragraph style={styles.themeHint}>{t('settings.backgroundImageHint')}</Paragraph>
               <Paragraph style={styles.themeLabel}>{t('settings.language')}</Paragraph>
               <SegmentedButtons
                 value={i18n.language === 'en' ? 'en' : 'ru'}
@@ -190,5 +223,26 @@ const styles = StyleSheet.create({
   },
   colorCircleSelected: {
     borderWidth: 3,
+  },
+  backgroundRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginTop: 8,
+    gap: BG_PREVIEW_GAP,
+  },
+  backgroundPreview: {
+    width: BG_PREVIEW_SIZE,
+    height: BG_PREVIEW_SIZE,
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  backgroundPreviewSelected: {
+    borderWidth: 3,
+  },
+  backgroundPreviewImage: {
+    width: '100%',
+    height: '100%',
   },
 });

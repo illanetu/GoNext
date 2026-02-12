@@ -3,6 +3,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const THEME_STORAGE_KEY = '@gonext_theme';
 const PRIMARY_COLOR_STORAGE_KEY = '@gonext_primary_color';
+const BACKGROUND_IMAGE_STORAGE_KEY = '@gonext_background_image';
+
+/** Индексы фоновых изображений (0–3). Соответствуют файлам в assets/backgrounds/. */
+export type BackgroundImageIndex = 0 | 1 | 2 | 3;
+
+const DEFAULT_BACKGROUND_INDEX: BackgroundImageIndex = 0;
 
 /** Палитра из 10 цветов для выбора основного цвета темы (кружки в настройках). */
 export const THEME_COLOR_PALETTE = [
@@ -30,6 +36,8 @@ type ThemeContextType = {
   isDark: boolean;
   primaryColor: string;
   setPrimaryColor: (color: string) => void;
+  backgroundImageIndex: BackgroundImageIndex;
+  setBackgroundImageIndex: (index: BackgroundImageIndex) => void;
 };
 
 const ThemeContext = createContext<ThemeContextType | null>(null);
@@ -38,9 +46,14 @@ function isValidPaletteColor(color: string): color is ThemePrimaryColor {
   return (THEME_COLOR_PALETTE as readonly string[]).includes(color);
 }
 
+function isValidBackgroundIndex(n: number): n is BackgroundImageIndex {
+  return n >= 0 && n <= 3;
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<ThemeMode>('light');
   const [primaryColor, setPrimaryColorState] = useState<string>(DEFAULT_PRIMARY);
+  const [backgroundImageIndex, setBackgroundImageIndexState] = useState<BackgroundImageIndex>(DEFAULT_BACKGROUND_INDEX);
 
   useEffect(() => {
     AsyncStorage.getItem(THEME_STORAGE_KEY).then((stored) => {
@@ -58,6 +71,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  useEffect(() => {
+    AsyncStorage.getItem(BACKGROUND_IMAGE_STORAGE_KEY).then((stored) => {
+      const n = stored !== null ? parseInt(stored, 10) : NaN;
+      if (isValidBackgroundIndex(n)) {
+        setBackgroundImageIndexState(n);
+      }
+    });
+  }, []);
+
   const setTheme = useCallback((mode: ThemeMode) => {
     setThemeState(mode);
     AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
@@ -69,12 +91,19 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     AsyncStorage.setItem(PRIMARY_COLOR_STORAGE_KEY, color);
   }, []);
 
+  const setBackgroundImageIndex = useCallback((index: BackgroundImageIndex) => {
+    setBackgroundImageIndexState(index);
+    AsyncStorage.setItem(BACKGROUND_IMAGE_STORAGE_KEY, String(index));
+  }, []);
+
   const value: ThemeContextType = {
     theme,
     setTheme,
     isDark: theme === 'dark',
     primaryColor,
     setPrimaryColor,
+    backgroundImageIndex,
+    setBackgroundImageIndex,
   };
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

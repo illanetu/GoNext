@@ -106,6 +106,8 @@
     "themeDark": "Тёмная",
     "themeHint": "В тёмной теме фоновое изображение отключено.",
     "primaryColor": "Основной цвет темы",
+    "backgroundImage": "Фоновое изображение",
+    "backgroundImageHint": "Только для светлой темы.",
     "moreSettings": "Настройки",
     "moreSettingsDescription": "Дополнительные настройки",
     "moreSettingsHint": "Будут добавлены в следующих версиях",
