@@ -15,6 +15,13 @@
     ],
     "android": {
       "package": "com.anonymous.gonext"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e7f4e0d9-e216-4c7d-a257-2c4599915f92"
+      }
+    },
+    "owner": "illane"
   }
 }
