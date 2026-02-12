@@ -1,9 +1,8 @@
-import { View, StyleSheet, ImageBackground } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, Button, Card, Title, Text } from 'react-native-paper';
 import { useRouter } from 'expo-router';
-
-const bgImage = require('../assets/backgrounds/gonext-bg.png');
+import { ScreenBackground } from '../components/ScreenBackground';
 
 const navItems = [
   { href: '/places', label: 'Места', icon: 'map-marker' },
@@ -17,7 +16,7 @@ export default function Home() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <Appbar.Header style={styles.header} elevated>
           <Appbar.Content title="GoNext" titleStyle={styles.headerTitle} />
         </Appbar.Header>
@@ -53,16 +52,13 @@ export default function Home() {
             </Card.Content>
           </Card>
         </View>
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   header: {

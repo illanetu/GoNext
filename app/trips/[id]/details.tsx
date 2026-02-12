@@ -5,7 +5,6 @@ import {
   ScrollView,
   RefreshControl,
   Alert,
-  ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
@@ -29,8 +28,7 @@ import {
 import type { TripPlaceWithDetails } from '../../../types';
 import type { Trip } from '../../../types';
 import { TripMapView } from '../../../components/TripMapView';
-
-const bgImage = require('../../../assets/backgrounds/gonext-bg.png');
+import { ScreenBackground } from '../../../components/ScreenBackground';
 
 function formatDateRange(start: string | null, end: string | null): string {
   if (!start && !end) return 'Даты не указаны';
@@ -168,11 +166,11 @@ export default function TripDetailsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" />
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
@@ -180,19 +178,19 @@ export default function TripDetailsScreen() {
   if (!trip || !id) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.emptyContainer}>
             <Paragraph>Поездка не найдена</Paragraph>
             <Button onPress={() => router.back()}>Назад</Button>
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -344,16 +342,13 @@ export default function TripDetailsScreen() {
           onPress={() => router.push(`/trips/${id}/edit` as any)}
           label="Редактировать"
         />
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   loadingContainer: {

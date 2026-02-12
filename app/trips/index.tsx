@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -11,8 +11,7 @@ import {
 } from 'react-native-paper';
 import { useRouter } from 'expo-router';
 import { getAllTripsWithPlacesCount, TripWithPlacesCount } from '../../services/tripsService';
-
-const bgImage = require('../../assets/backgrounds/gonext-bg.png');
+import { ScreenBackground } from '../../components/ScreenBackground';
 
 function formatDateRange(start: string | null, end: string | null): string {
   if (!start && !end) return 'Даты не указаны';
@@ -51,18 +50,18 @@ export default function TripsScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" />
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <ScrollView
           style={styles.scrollView}
           contentContainerStyle={styles.scrollContent}
@@ -114,16 +113,13 @@ export default function TripsScreen() {
           style={styles.fab}
           onPress={() => router.push('/trips/new' as any)}
         />
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   loadingContainer: {

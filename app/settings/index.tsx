@@ -1,8 +1,8 @@
-import { View, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Card, Title, Paragraph, List } from 'react-native-paper';
-
-const bgImage = require('../../assets/backgrounds/gonext-bg.png');
+import { Card, Title, Paragraph, List, SegmentedButtons } from 'react-native-paper';
+import { ScreenBackground } from '../../components/ScreenBackground';
+import { useTheme } from '../../contexts/ThemeContext';
 
 const APP_VERSION = '1.0.0';
 const APP_NAME = 'GoNext';
@@ -10,6 +10,8 @@ const APP_DESCRIPTION =
   'Дневник туриста — планируйте поездки, сохраняйте места и ведите дневник путешествий. Все данные хранятся только на вашем устройстве.';
 
 export default function SettingsScreen() {
+  const { theme, setTheme } = useTheme();
+
   const handleExportData = () => {
     Alert.alert(
       'Экспорт данных',
@@ -20,7 +22,7 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.scrollContent}
@@ -50,6 +52,26 @@ export default function SettingsScreen() {
             </List.Section>
           </Card>
 
+          {/* Тема */}
+          <Card style={styles.card} mode="elevated">
+            <List.Section>
+              <List.Subheader style={styles.listSubheader}>Оформление</List.Subheader>
+              <Paragraph style={styles.themeLabel}>Тема</Paragraph>
+              <SegmentedButtons
+                value={theme}
+                onValueChange={(v) => setTheme(v as 'light' | 'dark')}
+                buttons={[
+                  { value: 'light', label: 'Светлая', icon: 'white-balance-sunny' },
+                  { value: 'dark', label: 'Тёмная', icon: 'moon-waning-crescent' },
+                ]}
+                style={styles.segmented}
+              />
+              <Paragraph style={styles.themeHint}>
+                В тёмной теме фоновое изображение отключено.
+              </Paragraph>
+            </List.Section>
+          </Card>
+
           {/* Базовые настройки — заглушка для будущего */}
           <Card style={styles.card} mode="elevated">
             <List.Section>
@@ -64,16 +86,13 @@ export default function SettingsScreen() {
             </List.Section>
           </Card>
         </ScrollView>
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   scroll: {
@@ -111,5 +130,17 @@ const styles = StyleSheet.create({
   },
   listItem: {
     paddingRight: 8,
+  },
+  themeLabel: {
+    marginBottom: 8,
+    fontSize: 14,
+  },
+  segmented: {
+    marginBottom: 8,
+  },
+  themeHint: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 4,
   },
 });

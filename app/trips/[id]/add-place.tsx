@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -13,8 +13,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getAllPlaces } from '../../../services/placesService';
 import type { Place } from '../../../types';
 import { getTripPlaces, addPlaceToTrip } from '../../../services/tripPlacesService';
-
-const bgImage = require('../../../assets/backgrounds/gonext-bg.png');
+import { ScreenBackground } from '../../../components/ScreenBackground';
 
 export default function AddPlaceToTripScreen() {
   const router = useRouter();
@@ -88,18 +87,18 @@ export default function AddPlaceToTripScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" />
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <View style={styles.searchContainer}>
           <Searchbar
             placeholder="Поиск мест..."
@@ -157,16 +156,13 @@ export default function AddPlaceToTripScreen() {
             ))
           )}
         </ScrollView>
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   loadingContainer: {

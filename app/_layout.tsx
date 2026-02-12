@@ -4,6 +4,12 @@ import { PaperProvider } from 'react-native-paper';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { initDatabase } from '../database/db';
+import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
+
+function StatusBarTheme() {
+  const { isDark } = useTheme();
+  return <StatusBar style={isDark ? 'light' : 'auto'} />;
+}
 
 export default function RootLayout() {
   useEffect(() => {
@@ -15,9 +21,10 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <PaperProvider>
-        <StatusBar style="auto" />
-        <Stack
+      <ThemeProvider>
+        <PaperProvider>
+          <StatusBarTheme />
+          <Stack
           screenOptions={{
             headerBackVisible: true,
             headerBackTitleVisible: false,
@@ -57,7 +64,8 @@ export default function RootLayout() {
             options={{ title: 'Настройки', headerShown: true }} 
           />
         </Stack>
-      </PaperProvider>
+        </PaperProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

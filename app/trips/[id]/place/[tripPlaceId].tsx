@@ -1,11 +1,5 @@
 import { useState, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  ImageBackground,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -31,8 +25,7 @@ import {
 import { openInMaps, openInNavigator } from '../../../../utils/maps';
 import { PlaceMapView } from '../../../../components/PlaceMapView';
 import { PhotoGallery } from '../../../../components/PhotoGallery';
-
-const bgImage = require('../../../../assets/backgrounds/gonext-bg.png');
+import { ScreenBackground } from '../../../../components/ScreenBackground';
 
 export default function TripPlaceScreen() {
   const router = useRouter();
@@ -130,11 +123,11 @@ export default function TripPlaceScreen() {
   if (loading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" />
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
@@ -142,12 +135,12 @@ export default function TripPlaceScreen() {
   if (!item) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.emptyContainer}>
             <Paragraph>Место не найдено</Paragraph>
             <Button onPress={() => router.back()}>Назад</Button>
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
@@ -156,7 +149,7 @@ export default function TripPlaceScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <Card style={styles.card}>
             <Card.Content>
@@ -250,16 +243,13 @@ export default function TripPlaceScreen() {
             </Card.Content>
           </Card>
         </ScrollView>
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   loadingContainer: {

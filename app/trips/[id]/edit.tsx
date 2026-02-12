@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, ImageBackground } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   Card,
@@ -11,8 +11,7 @@ import {
 } from 'react-native-paper';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { getTripById, updateTrip, setCurrentTrip } from '../../../services/tripsService';
-
-const bgImage = require('../../../assets/backgrounds/gonext-bg.png');
+import { ScreenBackground } from '../../../components/ScreenBackground';
 
 export default function EditTripScreen() {
   const router = useRouter();
@@ -87,11 +86,11 @@ export default function EditTripScreen() {
   if (initialLoading) {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" />
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
@@ -99,19 +98,19 @@ export default function EditTripScreen() {
   if (!id || id === 'new') {
     return (
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+        <ScreenBackground>
           <View style={styles.emptyContainer}>
             <Paragraph>Поездка не найдена</Paragraph>
             <Button onPress={() => router.back()}>Назад</Button>
           </View>
-        </ImageBackground>
+        </ScreenBackground>
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
-      <ImageBackground source={bgImage} style={styles.background} resizeMode="cover">
+      <ScreenBackground>
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           <Card style={styles.card}>
             <Card.Content>
@@ -179,16 +178,13 @@ export default function EditTripScreen() {
             </Card.Content>
           </Card>
         </ScrollView>
-      </ImageBackground>
+      </ScreenBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-  },
-  background: {
     flex: 1,
   },
   loadingContainer: {
